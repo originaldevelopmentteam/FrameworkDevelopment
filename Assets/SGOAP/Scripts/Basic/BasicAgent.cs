@@ -14,8 +14,12 @@ namespace SGoap
         private void Awake()
         {
             Initialize();
-
             TargetManager.Add(this);
+        }
+
+        private void OnDestroy()
+        {
+            TargetManager.Remove(this);
         }
 
         public void Initialize()

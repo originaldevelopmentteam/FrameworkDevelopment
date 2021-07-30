@@ -30,7 +30,7 @@ namespace SGoap
                 if (_states[key] <= 0)
                     RemoveState(key);
             }
-            else
+            else if(value > 0)
                 AddState(key, value);
         }
 
@@ -45,5 +45,10 @@ namespace SGoap
         }
 
         public Dictionary<string, float> GetStates() => _states;
+
+        public void Clear()
+        {
+            _states.Clear();
+        }
     }
 }

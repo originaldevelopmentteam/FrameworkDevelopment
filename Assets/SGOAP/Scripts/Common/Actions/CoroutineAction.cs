@@ -1,23 +1,33 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SGoap
 {
-    public abstract class CoroutineAction : BasicAction
+    [Serializable]
+    public class CoroutineActionData
     {
-        public System.Action OnFirstPerform;
-
         public float MinimumRuntime = 0.5f;
 
-        [Header("Cool down settings")]
         [MinMax(0, 15)]
         public RangeValue CooldownRangeValue;
 
         [MinMax(0, 15)]
         public RangeValue StaggerRangeValue = new RangeValue(0, 0);
 
-        public override float CooldownTime => CooldownRangeValue.GetRandomValue();
-        public override float StaggerTime => StaggerRangeValue.GetRandomValue();
+        public bool StopOnFailed = true;
+        public bool RunCooldownOnFailed = true;
+    }
+
+    public abstract class CoroutineAction : BasicAction
+    {
+        public CoroutineActionData CoroutineData;
+
+        public System.Action OnFirstPerform;
+
+        public override float CooldownTime => CoroutineData.CooldownRangeValue.GetRandomValue();
+        public override float StaggerTime => CoroutineData.StaggerRangeValue.GetRandomValue();
 
         // When Agent planner can abort, this means a coroutine can get interrupted which we don't want.
         public override bool CanAbort() => false;
@@ -50,10 +60,21 @@ namespace SGoap
 
         public override EActionStatus Perform()
         {
-            if (TimeElapsed < MinimumRuntime)
+            if (TimeElapsed < CoroutineData.MinimumRuntime)
                 return EActionStatus.Running;
 
             return Status;
+        }
+
+        public override void OnFailed()
+        {
+            if (CoroutineData.RunCooldownOnFailed)
+                Cooldown.Run(CooldownTime);
+
+            if (CoroutineData.StopOnFailed)
+                StopCoroutine(_coroutine);
+
+            base.OnFailed();
         }
 
         public abstract IEnumerator PerformRoutine();

@@ -170,7 +170,11 @@ namespace SGoap
             _usedNodes.Push(firstNode);
 
             var leaves = ListPool<Node>.Get();
-            success = BuildGraph(firstNode, leaves, _actions, goal);
+
+            //success = BuildGraph(firstNode, leaves, _actions, goal); - This leads to a bug where success is false when there is a leaf
+            BuildGraph(firstNode, leaves, _actions, goal);
+            success = leaves.Count > 0;
+
             Profiler.EndSample();
             return leaves;
         }

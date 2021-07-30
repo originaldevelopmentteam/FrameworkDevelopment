@@ -26,7 +26,7 @@ namespace SGoap
         public State[] AfterEffects;
         public States States;
 
-        public System.Action OnPrePerform, OnPostPerform, OnPerform;
+        public System.Action OnPrePerform, OnPostPerform, OnPerform, OnPerformFailed;
 
         [HideInInspector]
         public int CostEvaluationType, AchievableEvaluationType, AbortEvaluatorType;
