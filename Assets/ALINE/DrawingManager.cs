@@ -226,6 +226,12 @@ namespace Drawing {
 			// Check if the object still exists (it might have been destroyed in some other way already).
 			if (gameObject) GameObject.DestroyImmediate(gameObject);
 		}
+
+		void OnPlayModeStateChanged (PlayModeStateChange change) {
+			if (change == PlayModeStateChange.ExitingEditMode || change == PlayModeStateChange.ExitingPlayMode) {
+				gizmos.sceneModeVersion++;
+			}
+		}
 #endif
 
 		void OnEnable () {
@@ -258,6 +264,7 @@ namespace Drawing {
 			UnityEngine.Rendering.RenderPipelineManager.endCameraRendering += EndCameraRendering;
 #if UNITY_EDITOR
 			EditorApplication.update += OnUpdate;
+			EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
 #endif
 		}
 
@@ -268,7 +275,8 @@ namespace Drawing {
 			if (detectedRenderPipeline == DetectedRenderPipeline.URP) {
 				for (int i = 0; i < cameras.Length; i++) {
 					var cam = cameras[i];
-					if (cam.TryGetComponent<UniversalAdditionalCameraData>(out UniversalAdditionalCameraData data)) {
+					var data = cam.GetUniversalAdditionalCameraData();
+					if (data != null) {
 						var renderer = data.scriptableRenderer;
 
 						// Ensure we don't add passes every frame, we only need to do this once
@@ -297,6 +305,7 @@ namespace Drawing {
 			UnityEngine.Rendering.RenderPipelineManager.endCameraRendering -= EndCameraRendering;
 #if UNITY_EDITOR
 			EditorApplication.update -= OnUpdate;
+			EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
 #endif
 			// Gizmos can be null here if this GameObject was duplicated by a user in the hierarchy.
 			if (gizmos != null) {

@@ -39,8 +39,8 @@ namespace EasyMobile.Editor
         const string TapJoyAvailMsg = "Tapjoy plugin was imported.";
         const string UnityAdsUnvailableWarning = "Unity Ads service is disabled or not available for the current platform. To enable it go to Window > Services and make sure the current platform is iOS or Android.";
         const string UnityAdsAvailableMsg = "Unity Ads service is enabled.";
-        const string UnityAdsDefaultPlacementsMsg = "The below interstitial and rewarded ad placement IDs match the default IDs generated automatically by Unity Ads . " +
-                                                    "These IDs are not editable and you should avoid repeating them when creating custom placements.";
+        const string UnityAdsDefaultPlacementsMsg = "The below ad placement IDs match the default IDs generated automatically by Unity Ads . " +
+                                                    "Generally these should not be modified and you should also avoid repeating them when creating custom placements.";
         const string UnityAdsMonetizationSDKRequiredMsg = "The current built-in Unity Ads service doesn't support banner ads. Please import the Unity Monetization SDK from Assets Store to use Unity's banner ads.";
         const string AdvertisingConstantGenerationIntro = "Generate the static class " + EM_Constants.RootNameSpace + "." + EM_Constants.AdvertisingConstantsClassName + " that contains the constants of the above ad IDs." +
                                                           " Remember to regenerate if you make changes to these IDs.";
@@ -172,6 +172,20 @@ namespace EasyMobile.Editor
                     MarkSubModulEnableStateHasChanged();
             }
         }
+        private bool UseUnityAds4
+        {
+            get
+            {
+                return AdProperties.unityAds4Enabled.property.boolValue;
+            }
+            set
+            {
+                bool needToUpdate = value != UseUnityAds4;
+                AdProperties.unityAds4Enabled.property.boolValue = value;
+                if (needToUpdate)
+                    MarkSubModulEnableStateHasChanged();
+            }
+        }
         private bool IsAppLovingEnabled
         {
             get
@@ -289,7 +303,7 @@ namespace EasyMobile.Editor
                             EditorGUILayout.HelpBox("Default ad network " + network.ToString() + " has no SDK. Please import its plugin.", MessageType.Warning);
                         }
                     }
-
+#if !EM_UNITY_ADS_4
                     if (((AdNetwork)androidDefault.bannerAdNetwork == AdNetwork.UnityAds) || ((AdNetwork)iosDefault.bannerAdNetwork == AdNetwork.UnityAds))
                     {
                         if (IsPluginAvail(AdNetwork.UnityAds) && !IsUnityMonetizationAvail())
@@ -302,6 +316,7 @@ namespace EasyMobile.Editor
                             EditorGUILayout.HelpBox(UnityAdsMonetizationSDKRequiredMsg, MessageType.Warning);
                         }
                     }
+#endif
                 });
 
             // AdColony setup
@@ -1026,12 +1041,17 @@ namespace EasyMobile.Editor
                 {
                     if (!IsUnityAdsEnabled)
                         return;
-#if (!UNITY_ADS && !UNITY_MONETIZATION)
+                    
+#if (!UNITY_ADS && !(UNITY_MONETIZATION || EM_UNITY_ADS_4))
                     EditorGUILayout.HelpBox(UnityAdsUnvailableWarning, MessageType.Warning);
 #else
                     EditorGUILayout.HelpBox(UnityAdsAvailableMsg, MessageType.Info);
 
-#if UNITY_MONETIZATION
+                    // Using UnityAds 4
+                    EditorGUILayout.Space();
+                    UseUnityAds4 = EditorGUILayout.Toggle("Unity Ads v4",UseUnityAds4);
+
+#if UNITY_MONETIZATION || EM_UNITY_ADS_4
                     // APP ID
                     EditorGUILayout.Space();
                     EditorGUILayout.LabelField("App ID", EditorStyles.boldLabel);
@@ -1042,32 +1062,29 @@ namespace EasyMobile.Editor
                     // Default Placements.
                     EditorGUILayout.Space();
                     EditorGUILayout.LabelField("Default Placement", EditorStyles.boldLabel);
-
-#if UNITY_MONETIZATION
+                    EditorGUILayout.HelpBox(UnityAdsDefaultPlacementsMsg, MessageType.None);
+#if UNITY_MONETIZATION || EM_UNITY_ADS_4
                     EditorGUI.indentLevel++;
                     EditorGUILayout.PropertyField(AdProperties.unityAdsDefaultBannerAdId.property, AdProperties.unityAdsDefaultBannerAdId.content, true);
                     EditorGUI.indentLevel--;
 #endif
-                    EditorGUILayout.HelpBox(UnityAdsDefaultPlacementsMsg, MessageType.None);
                     EditorGUI.indentLevel++;
                     // not allowing modifying default UnityAds default placement IDs
-                    EditorGUI.BeginDisabledGroup(true);
                     EditorGUILayout.PropertyField(AdProperties.unityAdsDefaultInterstitialAdId.property, AdProperties.unityAdsDefaultInterstitialAdId.content, true);
                     EditorGUILayout.PropertyField(AdProperties.unityAdsDefaultRewardedAdId.property, AdProperties.unityAdsDefaultRewardedAdId.content, true);
-                    EditorGUI.EndDisabledGroup();
                     EditorGUI.indentLevel--;
 
                     // Custom placements.
                     EditorGUILayout.Space();
                     EditorGUILayout.LabelField("Custom Placements", EditorStyles.boldLabel);
                     EditorGUI.indentLevel++;
-#if UNITY_MONETIZATION
+#if UNITY_MONETIZATION || EM_UNITY_ADS_4
                     EditorGUILayout.PropertyField(AdProperties.unityAdsCustomBannerAdId.property, AdProperties.unityAdsCustomBannerAdId.content, true);
 #endif
                     EditorGUILayout.PropertyField(AdProperties.unityAdsCustomInterstitialAdIds.property, AdProperties.unityAdsCustomInterstitialAdIds.content, true);
                     EditorGUILayout.PropertyField(AdProperties.unityAdsCustomRewardedAdIds.property, AdProperties.unityAdsCustomRewardedAdIds.content, true);
                     EditorGUI.indentLevel--;
-#if UNITY_MONETIZATION
+#if UNITY_MONETIZATION || EM_UNITY_ADS_4
                     // Test mode.
                     EditorGUILayout.Space();
                     EditorGUILayout.LabelField("Test Mode", EditorStyles.boldLabel);

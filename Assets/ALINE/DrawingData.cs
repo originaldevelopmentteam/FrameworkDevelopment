@@ -174,30 +174,29 @@ namespace Drawing {
 			}
 
 			public struct MeshBuffers {
-				public UnsafeAppendBuffer splitterOutput, vertices, triangles, solidVertices, solidTriangles, textVertices, textTriangles, capturedState;
+				[NoAliasAttribute]
+				public UnsafeAppendBuffer splitterOutput, solidVertices, solidTriangles, textVertices, textTriangles, capturedState, lineData;
 				public Bounds bounds;
 
 				public MeshBuffers(Allocator allocator) {
 					splitterOutput = new UnsafeAppendBuffer(0, 4, allocator);
-					vertices = new UnsafeAppendBuffer(0, 4, allocator);
-					triangles = new UnsafeAppendBuffer(0, 4, allocator);
 					solidVertices = new UnsafeAppendBuffer(0, 4, allocator);
 					solidTriangles = new UnsafeAppendBuffer(0, 4, allocator);
 					textVertices = new UnsafeAppendBuffer(0, 4, allocator);
 					textTriangles = new UnsafeAppendBuffer(0, 4, allocator);
 					capturedState = new UnsafeAppendBuffer(0, 4, allocator);
+					lineData = new UnsafeAppendBuffer(0, 4, allocator);
 					bounds = new Bounds();
 				}
 
 				public void Dispose () {
 					splitterOutput.Dispose();
-					vertices.Dispose();
-					triangles.Dispose();
 					solidVertices.Dispose();
 					solidTriangles.Dispose();
 					textVertices.Dispose();
 					textTriangles.Dispose();
 					capturedState.Dispose();
+					lineData.Dispose();
 				}
 			}
 
@@ -234,14 +233,14 @@ namespace Drawing {
 				}
 			}
 
-			public void SchedulePersistFilter (int version, float time, bool isPlaying) {
+			public void SchedulePersistFilter (int version, float time, int sceneModeVersion) {
 				if (type != Type.Persistent) throw new System.InvalidOperationException();
 
 				splitterJob.Complete();
 
 				// If data was from a different game mode then it shouldn't live any longer.
 				// E.g. editor mode => game mode
-				if (meta.isCreatedInGameMode != isPlaying) {
+				if (meta.sceneModeVersion != sceneModeVersion) {
 					meta.version = -1;
 					return;
 				}
@@ -290,9 +289,6 @@ namespace Drawing {
 				if (type == Type.Static && submitted) return;
 				buildJob.Complete();
 				unsafe {
-					// Remove any existing meshes since we will generate new ones.
-					// We do not remove custom meshes because we do not regenerate those.
-					PoolMeshes(gizmos);
 					CommandBuilder.BuildMesh(gizmos, meshes, (MeshBuffers*)temporaryMeshBuffers.GetUnsafePtr());
 				}
 				submitted = true;
@@ -308,7 +304,8 @@ namespace Drawing {
 					Color color;
 					Matrix4x4 matrix;
 					int drawOrderIndex;
-					if ((itemMeshes[i].type & MeshType.Custom) != 0) {
+					var itemMesh = itemMeshes[i];
+					if ((itemMesh.type & MeshType.Custom) != 0) {
 						UnityEngine.Assertions.Assert.IsTrue(customMeshIndex < maxCustomMeshes);
 
 						// The color and orientation of custom meshes are stored in the captured state array.
@@ -330,22 +327,31 @@ namespace Drawing {
 						drawOrderIndex = meta.drawOrderIndex;
 					}
 					meshes.Add(new RenderedMeshWithType {
-						mesh = itemMeshes[i].mesh,
-						type = itemMeshes[i].type,
+						mesh = itemMesh.mesh,
+						type = itemMesh.type,
 						drawingOrderIndex = drawOrderIndex,
 						color = color,
 						matrix = matrix,
+						buffer = itemMesh.buffer,
+						proceduralVertices = itemMesh.proceduralVertices,
+						bounds = itemMesh.bounds,
 					});
 				}
 			}
 
-			void PoolMeshes (DrawingData gizmos) {
+			void PoolMeshes (DrawingData gizmos, bool includeCustom) {
 				if (!isValid) throw new System.InvalidOperationException();
 				var outIndex = 0;
 				for (int i = 0; i < meshes.Count; i++) {
-					// Custom meshes should never be pooled since they are supplied by the user
-					if ((meshes[i].type & MeshType.Custom) == 0) {
-						gizmos.PoolMesh(meshes[i].mesh);
+					// Custom meshes should only be pooled if the Pool flag is set.
+					// Otherwise they are supplied by the user and it's up to them how to handle it.
+					if ((meshes[i].type & MeshType.Custom) == 0 || (includeCustom && (meshes[i].type & MeshType.Pool) != 0)) {
+						if (meshes[i].mesh != null) {
+							gizmos.PoolMesh(meshes[i].mesh);
+						}
+						if (meshes[i].buffer != null) {
+							gizmos.PoolComputeBuffer(meshes[i].buffer);
+						}
 					} else {
 						// Retain custom meshes
 						meshes[outIndex] = meshes[i];
@@ -355,9 +361,14 @@ namespace Drawing {
 				meshes.RemoveRange(outIndex, meshes.Count - outIndex);
 			}
 
+			public void PoolDynamicMeshes (DrawingData gizmos) {
+				if (type == Type.Static && submitted) return;
+				PoolMeshes(gizmos, false);
+			}
+
 			public void Release (DrawingData gizmos) {
 				if (!isValid) throw new System.InvalidOperationException();
-				PoolMeshes(gizmos);
+				PoolMeshes(gizmos, true);
 				// Clear custom meshes too
 				meshes.Clear();
 				type = Type.Invalid;
@@ -376,6 +387,11 @@ namespace Drawing {
 			}
 		}
 
+		internal struct SubmittedMesh {
+			public Mesh mesh;
+			public bool temporary;
+		}
+
 		[BurstCompile]
 		internal struct BuilderData : IDisposable {
 			public enum State {
@@ -392,7 +408,8 @@ namespace Drawing {
 				public RedrawScope redrawScope2;
 				public int version;
 				public bool isGizmos;
-				public bool isCreatedInGameMode;
+				/// <summary>Used to invalidate gizmos when the scene mode changes</summary>
+				public int sceneModeVersion;
 				public int drawOrderIndex;
 				public Camera[] cameraTargets;
 			}
@@ -451,7 +468,7 @@ namespace Drawing {
 			}
 
 			public BitPackedMeta packedMeta;
-			public List<Mesh> meshes;
+			public List<SubmittedMesh> meshes;
 			public NativeArray<UnsafeAppendBuffer> commandBuffers;
 			public State state { get; private set; }
 			// TODO?
@@ -469,7 +486,7 @@ namespace Drawing {
 
 			static int UniqueIDCounter = 0;
 
-			public void Init (Hasher hasher, RedrawScope frameRedrawScope, RedrawScope customRedrawScope, bool isGizmos, int drawOrderIndex) {
+			public void Init (Hasher hasher, RedrawScope frameRedrawScope, RedrawScope customRedrawScope, bool isGizmos, int drawOrderIndex, int sceneModeVersion) {
 				if (state != State.Reserved) throw new System.InvalidOperationException();
 
 				meta = new Meta {
@@ -479,11 +496,11 @@ namespace Drawing {
 					isGizmos = isGizmos,
 					version = 0, // Will be filled in later
 					drawOrderIndex = drawOrderIndex,
-					isCreatedInGameMode = Application.isPlaying,
+					sceneModeVersion = sceneModeVersion,
 					cameraTargets = null,
 				};
 
-				if (meshes == null) meshes = new List<Mesh>();
+				if (meshes == null) meshes = new List<SubmittedMesh>();
 				if (!commandBuffers.IsCreated) {
 					commandBuffers = new NativeArray<UnsafeAppendBuffer>(JobsUtility.MaxJobThreadCount, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
 					for (int i = 0; i < commandBuffers.Length; i++) commandBuffers[i] = new UnsafeAppendBuffer(0, 4, Allocator.Persistent);
@@ -585,7 +602,7 @@ namespace Drawing {
 					var customMeshes = gizmos.processedData.Get(dynamicBuffer).meshes;
 
 					// Copy meshes to render
-					for (int i = 0; i < meshes.Count; i++) customMeshes.Add(new MeshWithType { mesh = meshes[i], type = MeshType.Solid | MeshType.Custom });
+					for (int i = 0; i < meshes.Count; i++) customMeshes.Add(new MeshWithType { mesh = meshes[i].mesh, type = MeshType.Solid | MeshType.Custom | (meshes[i].temporary ? MeshType.Pool : 0) });
 					meshes.Clear();
 				}
 
@@ -773,6 +790,21 @@ namespace Drawing {
 				Profiler.EndSample();
 			}
 
+			/// <summary>
+			/// Remove any existing dynamic meshes since we know we will not need them after this frame.
+			/// We do not remove custom meshes or static ones because those may be kept between frames and cameras.
+			/// </summary>
+			public void PoolDynamicMeshes (DrawingData gizmos) {
+				if (data == null) return;
+				Profiler.BeginSample("Pool");
+				for (int i = 0; i < data.Length; i++) {
+					if (data[i].isValid) {
+						data[i].PoolDynamicMeshes(gizmos);
+					}
+				}
+				Profiler.EndSample();
+			}
+
 			public void CollectMeshes (int versionThreshold, List<RenderedMeshWithType> meshes, Camera camera, bool allowGizmos, bool allowCameraDefault) {
 				if (data == null) return;
 				for (int i = 0; i < data.Length; i++) {
@@ -782,11 +814,11 @@ namespace Drawing {
 				}
 			}
 
-			public void FilterOldPersistentCommands (int version, float time, bool isPlaying) {
+			public void FilterOldPersistentCommands (int version, float time, int sceneModeVersion) {
 				if (data == null) return;
 				for (int i = 0; i < data.Length; i++) {
 					if (data[i].isValid && data[i].type == ProcessedBuilderData.Type.Persistent) {
-						data[i].SchedulePersistFilter(version, time, isPlaying);
+						data[i].SchedulePersistFilter(version, time, sceneModeVersion);
 					}
 				}
 			}
@@ -865,11 +897,17 @@ namespace Drawing {
 			Text = 1 << 2,
 			// Set if the mesh is not a built-in mesh. These may have non-identity matrices set.
 			Custom = 1 << 3,
+			// If set for a custom mesh, the mesh will be pooled.
+			// This is used for temporary custom meshes that are created by ALINE
+			Pool = 1 << 4,
 		}
 
 		internal struct MeshWithType {
 			public Mesh mesh;
 			public MeshType type;
+			public ComputeBufferMeta buffer;
+			public Bounds bounds;
+			public int proceduralVertices;
 		}
 
 		internal struct RenderedMeshWithType {
@@ -880,30 +918,87 @@ namespace Drawing {
 			public Color color;
 			// May only be set to a non-identity matrix if type contains MeshType.Custom
 			public Matrix4x4 matrix;
+			public ComputeBufferMeta buffer;
+			public int proceduralVertices;
+			public Bounds bounds;
 		}
 
 		internal BuilderDataContainer data;
 		internal ProcessedBuilderDataContainer processedData;
 		List<RenderedMeshWithType> meshes = new List<RenderedMeshWithType>();
-		Stack<Mesh> cachedMeshes = new Stack<Mesh>();
+		List<Mesh> cachedMeshes = new List<Mesh>();
+		List<Mesh> stagingCachedMeshes = new List<Mesh>();
+		int lastTimeLargestCachedMeshWasUsed = 0;
 		internal SDFLookupData fontData;
 		int currentDrawOrderIndex = 0;
+
+		/// <summary>
+		/// Incremented every time the editor goes from play mode -> edit mode, or edit mode -> play mode.
+		/// Used to ensure that no WithDuration scopes survive this transition.
+		///
+		/// Normally it is not important, but when Unity's enter play mode settings have reload domain disabled
+		/// then it can become important since this manager will survive the transition.
+		/// </summary>
+		internal int sceneModeVersion = 0;
+
+		/// <summary>
+		/// Slightly adjusted scene mode version.
+		/// This takes into account `Application.isPlaying` too. It is possible for <see cref="sceneModeVersion"/> to be modified
+		/// and then some gizmos are drawn before the actual play mode change happens (with the old Application.isPlaying) mode.
+		///
+		/// More precisely, what could happen without this adjustment is
+		/// 1. EditorApplication.playModeStateChanged (PlayModeStateChange.ExitingPlayMode) fires which increments sceneModeVersion.
+		/// 2. A final update loop runs with Application.isPlaying = true.
+		/// 3. During this loop, a new command builder is created with the new sceneModeVersion and Application.isPlaying=true and is drawn to using a WithDuration scope.
+		/// 4. The play mode changes to editor mode.
+		/// 5. The WithDuration scope survives!
+		///
+		/// We cannot increment sceneModeVersion on PlayModeStateChange.ExitedPlayMode (not Exiting) instead, because some gizmos which we want to keep may
+		/// be drawn before that event fires. Yay, Unity is so helpful.
+		/// </summary>
+		int adjustedSceneModeVersion {
+			get {
+				return sceneModeVersion + (Application.isPlaying ? 1000 : 0);
+			}
+		}
 
 		internal int GetNextDrawOrderIndex () {
 			currentDrawOrderIndex++;
 			return currentDrawOrderIndex;
 		}
 
-		void PoolMesh (Mesh mesh) {
+		internal void PoolMesh (Mesh mesh) {
 			// Note: clearing the mesh here will deallocate the vertex/index buffers
 			// This is not good for performance as it will have to be allocated again (likely with the same size) in the next frame
 			//mesh.Clear();
-			cachedMeshes.Push(mesh);
+			stagingCachedMeshes.Add(mesh);
 		}
 
-		internal Mesh GetMesh () {
+		void SortPooledMeshes () {
+			// TODO: Is accessing the vertex count slow?
+			cachedMeshes.Sort((a, b) => b.vertexCount - a.vertexCount);
+		}
+
+		internal Mesh GetMesh (int desiredVertexCount) {
 			if (cachedMeshes.Count > 0) {
-				return cachedMeshes.Pop();
+				// Do a binary search to find the smallest cached mesh which is larger or equal to the desired vertex count
+				// TODO: We should actually compare the byte size of the vertex buffer, not the number of vertices because
+				// the vertex size can change depending on the mesh attribute layout.
+				int mn = 0;
+				int mx = cachedMeshes.Count;
+				while (mx > mn + 1) {
+					int mid = (mn+mx)/2;
+					if (cachedMeshes[mid].vertexCount < desiredVertexCount) {
+						mx = mid;
+					} else {
+						mn = mid;
+					}
+				}
+
+				var res = cachedMeshes[mn];
+				if (mn == 0) lastTimeLargestCachedMeshWasUsed = version;
+				cachedMeshes.RemoveAt(mn);
+				return res;
 			} else {
 				var mesh = new Mesh {
 					hideFlags = HideFlags.DontSave
@@ -916,6 +1011,7 @@ namespace Drawing {
 		internal void LoadFontDataIfNecessary () {
 			if (fontData.material == null) {
 				var font = DefaultFonts.LoadDefaultFont();
+				fontData.Dispose();
 				fontData = new SDFLookupData(font);
 			}
 		}
@@ -948,12 +1044,12 @@ namespace Drawing {
 		/// If false, it will only be rendered in the editor when gizmos are enabled.</param>
 		public CommandBuilder GetBuilder (bool renderInGame = false) {
 			UpdateTime();
-			return new CommandBuilder(this, Hasher.NotSupplied, frameRedrawScope, default, !renderInGame, false);
+			return new CommandBuilder(this, Hasher.NotSupplied, frameRedrawScope, default, !renderInGame, false, adjustedSceneModeVersion);
 		}
 
 		public CommandBuilder GetBuiltInBuilder (bool renderInGame = false) {
 			UpdateTime();
-			return new CommandBuilder(this, Hasher.NotSupplied, frameRedrawScope, default, !renderInGame, true);
+			return new CommandBuilder(this, Hasher.NotSupplied, frameRedrawScope, default, !renderInGame, true, adjustedSceneModeVersion);
 		}
 
 		/// <summary>
@@ -964,7 +1060,7 @@ namespace Drawing {
 		/// <param name="renderInGame">If true, this builder will be rendered in standalone games and in the editor even if gizmos are disabled.</param>
 		public CommandBuilder GetBuilder (RedrawScope redrawScope, bool renderInGame = false) {
 			UpdateTime();
-			return new CommandBuilder(this, Hasher.NotSupplied, frameRedrawScope, redrawScope, !renderInGame, false);
+			return new CommandBuilder(this, Hasher.NotSupplied, frameRedrawScope, redrawScope, !renderInGame, false, adjustedSceneModeVersion);
 		}
 
 		/// <summary>
@@ -979,7 +1075,7 @@ namespace Drawing {
 			// Do not do this if a hash is not given.
 			if (!hasher.Equals(Hasher.NotSupplied)) DiscardData(hasher);
 			UpdateTime();
-			return new CommandBuilder(this, hasher, frameRedrawScope, redrawScope, !renderInGame, false);
+			return new CommandBuilder(this, hasher, frameRedrawScope, redrawScope, !renderInGame, false, adjustedSceneModeVersion);
 		}
 
 		/// <summary>Material to use for surfaces</summary>
@@ -1047,11 +1143,24 @@ namespace Drawing {
 			data.ReleaseAllUnused();
 			// Remove persistent commands that have timed out.
 			// When not playing then persistent commands are never drawn twice
-			processedData.FilterOldPersistentCommands(version, CurrentTime, Application.isPlaying);
+			processedData.FilterOldPersistentCommands(version, CurrentTime, adjustedSceneModeVersion);
 			processedData.ReleaseDataOlderThan(this, lastTickVersion2 + 1);
 			lastTickVersion2 = lastTickVersion;
 			lastTickVersion = version;
 			currentDrawOrderIndex = 0;
+
+			// Pooled meshes from the previous frame can now be used
+			cachedMeshes.AddRange(stagingCachedMeshes);
+			stagingCachedMeshes.Clear();
+			SortPooledMeshes();
+
+			// If the largest cached mesh hasn't been used in a while, then remove it to free up the memory
+			if (version - lastTimeLargestCachedMeshWasUsed > 60 && cachedMeshes.Count > 0) {
+				Mesh.DestroyImmediate(cachedMeshes[0]);
+				cachedMeshes.RemoveAt(0);
+				lastTimeLargestCachedMeshWasUsed = version;
+			}
+
 			// TODO: Filter cameraVersions to avoid memory leak
 		}
 
@@ -1083,15 +1192,16 @@ namespace Drawing {
 			// Note: When importing the package for the first time the asset database may not be up to date and Resources.Load may return null.
 
 			if (surfaceMaterial == null) {
-				surfaceMaterial = Resources.Load<Material>("aline_surface");
+				surfaceMaterial = Resources.Load<Material>("aline_surface_mat");
 				ConfigureMaterialFeature(surfaceMaterial, detectedRenderPipeline);
 			}
 			if (lineMaterial == null) {
-				lineMaterial = Resources.Load<Material>("aline_outline");
+				lineMaterial = Resources.Load<Material>("aline_outline_mat");
 				ConfigureMaterialFeature(lineMaterial, detectedRenderPipeline);
 			}
 			if (fontData.material == null) {
 				var font = DefaultFonts.LoadDefaultFont();
+				fontData.Dispose();
 				fontData = new SDFLookupData(font);
 				ConfigureMaterialFeature(fontData.material, detectedRenderPipeline);
 			}
@@ -1099,6 +1209,41 @@ namespace Drawing {
 
 		public DrawingData() {
 			LoadMaterials(DetectedRenderPipeline.BuiltInOrCustom);
+		}
+
+		static int CeilLog2 (int x) {
+			// Should use `math.ceillog2` whenever we next raise the minimum compatible version of the mathematics package.
+			// This variant is prone to floating point errors.
+			return (int)math.ceil(math.log2(x));
+		}
+
+		internal class ComputeBufferMeta {
+			public ComputeBuffer buffer;
+			public int length;
+		}
+
+		List<Stack<ComputeBufferMeta> > computeBufferPool = new List<Stack<ComputeBufferMeta> >();
+
+		internal ComputeBufferMeta GetComputeBuffer (int minSize) {
+			if (minSize == 0) throw new ArgumentOutOfRangeException();
+			int index = CeilLog2(minSize);
+			while (index >= computeBufferPool.Count) computeBufferPool.Add(new Stack<ComputeBufferMeta>());
+			var stack = computeBufferPool[index];
+			if (stack.Count > 0) {
+				return stack.Pop();
+			} else {
+				int length = 1 << index;
+				return new ComputeBufferMeta {
+						   buffer = new ComputeBuffer(length, Unity.Collections.LowLevel.Unsafe.UnsafeUtility.SizeOf<CommandBuilder.LineInstanceData>(), ComputeBufferType.Structured),
+						   length = length
+				};
+			}
+		}
+
+		internal void PoolComputeBuffer (ComputeBufferMeta buffer) {
+			int index = CeilLog2(buffer.length);
+
+			computeBufferPool[index].Push(buffer);
 		}
 
 		/// <summary>Call after all <see cref="Draw"/> commands for the frame have been done to draw everything.</summary>
@@ -1162,15 +1307,18 @@ namespace Drawing {
 				Profiler.BeginSample("Collect Meshes");
 				meshes.Clear();
 				processedData.CollectMeshes(cameraRenderingRange.start, meshes, cam, allowGizmos, allowCameraDefault);
+				processedData.PoolDynamicMeshes(this);
 				Profiler.EndSample();
 				Profiler.BeginSample("Sorting Meshes");
 				// Note that a stable sort is required as some meshes may have the same sorting index
 				// but those meshes will have a consistent ordering between them in the list
 				meshes.Sort(meshSorter);
 				Profiler.EndSample();
+				Profiler.BeginSample("Building Command Buffer");
 
 				int colorID = Shader.PropertyToID("_Color");
 				var baseColor = surfaceMaterial.GetColor(colorID);
+				int bufferID = Shader.PropertyToID("lineInstances");
 
 				// First surfaces, then lines
 				for (int matIndex = 0; matIndex <= 2; matIndex++) {
@@ -1188,6 +1336,11 @@ namespace Drawing {
 										customMaterialProperties.SetColor(colorID, baseColor * mesh.color);
 										commandBuffer.DrawMesh(mesh.mesh, mesh.matrix, mat, 0, pass, customMaterialProperties);
 									}
+								} else if (mesh.type == MeshType.Lines && mesh.buffer != null) {
+									if (GeometryUtility.TestPlanesAABB(planes, mesh.bounds)) {
+										customMaterialProperties.SetBuffer(bufferID, mesh.buffer.buffer);
+										commandBuffer.DrawProcedural(Matrix4x4.identity, mat, pass, MeshTopology.Triangles, mesh.proceduralVertices, 1, customMaterialProperties);
+									}
 								} else if (GeometryUtility.TestPlanesAABB(planes, mesh.mesh.bounds)) {
 									// This mesh is drawn with an identity matrix
 									commandBuffer.DrawMesh(mesh.mesh, Matrix4x4.identity, mat, 0, pass, null);
@@ -1198,6 +1351,7 @@ namespace Drawing {
 				}
 
 				meshes.Clear();
+				Profiler.EndSample();
 			}
 
 			cameraVersions[cam] = cameraRenderingRange;
@@ -1234,9 +1388,17 @@ namespace Drawing {
 			data.Dispose();
 			processedData.Dispose(this);
 
-			while (cachedMeshes.Count > 0) {
-				Mesh.DestroyImmediate(cachedMeshes.Pop());
+			for (int i = 0; i < cachedMeshes.Count; i++) {
+				Mesh.DestroyImmediate(cachedMeshes[i]);
 			}
+			cachedMeshes.Clear();
+
+			for (int i = 0; i < computeBufferPool.Count; i++) {
+				while (computeBufferPool[i].Count > 0) {
+					computeBufferPool[i].Pop().buffer.Release();
+				}
+			}
+
 
 			UnityEngine.Assertions.Assert.IsTrue(meshes.Count == 0);
 			fontData.Dispose();
