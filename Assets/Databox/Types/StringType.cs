@@ -32,7 +32,7 @@ public class StringType : DataboxType {
 	
 	public override void DrawEditor()
 	{
-		Value = GUILayout.TextField(Value);
+		Value = GUILayout.TextArea(Value);
 	}
 	
 	public override void DrawInitValueEditor()
@@ -41,7 +41,7 @@ public class StringType : DataboxType {
 		GUILayout.Label("Init Value:");
 		GUI.color = Color.white;
 		
-		InitValue = GUILayout.TextField(InitValue);
+		InitValue = GUILayout.TextArea(InitValue);
 	} 
 	
 	// Reset value back to initial value

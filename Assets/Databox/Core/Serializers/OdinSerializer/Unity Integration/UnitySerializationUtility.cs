@@ -50,6 +50,10 @@ namespace Databox.OdinSerializer
     {
         public static readonly Type SerializeReferenceAttributeType = typeof(SerializeField).Assembly.GetType("UnityEngine.SerializeReference");
 
+        private static readonly Assembly String_Assembly = typeof(string).Assembly;
+        private static readonly Assembly HashSet_Assembly = typeof(HashSet<>).Assembly;
+        private static readonly Assembly LinkedList_Assembly = typeof(LinkedList<>).Assembly;
+
 #if UNITY_EDITOR        
         /// <summary>
         /// From the new scriptable build pipeline package
@@ -149,6 +153,11 @@ namespace Databox.OdinSerializer
         private static readonly HashSet<Type> UnityNeverSerializesTypes = new HashSet<Type>()
         {
             typeof(Coroutine)
+        };
+
+        private static readonly HashSet<string> UnityNeverSerializesTypeNames = new HashSet<string>()
+        {
+            "UnityEngine.AnimationState"
         };
 
 #if UNITY_EDITOR
@@ -331,7 +340,7 @@ namespace Databox.OdinSerializer
         {
             FieldInfo fieldInfo = member as FieldInfo;
 
-            if (fieldInfo == null || fieldInfo.IsStatic)
+            if (fieldInfo == null || fieldInfo.IsStatic || fieldInfo.IsInitOnly)
             {
                 return false;
             }
@@ -394,13 +403,18 @@ namespace Databox.OdinSerializer
 
         private static bool GuessIfUnityWillSerializePrivate(Type type)
         {
-            if (UnityNeverSerializesTypes.Contains(type))
+            if (UnityNeverSerializesTypes.Contains(type) || UnityNeverSerializesTypeNames.Contains(type.FullName))
             {
                 return false;
             }
 
-            if (typeof(UnityEngine.Object).IsAssignableFrom(type) && type.GetGenericArguments().Length == 0)
+            if (typeof(UnityEngine.Object).IsAssignableFrom(type))
             {
+                if (type.IsGenericType)
+                {
+                    return UnityVersion.IsVersionOrGreater(2020, 1);
+                }
+
                 // Unity will always serialize all of its own special objects
                 // Except when they have generic type arguments.
                 return true;
@@ -480,8 +494,9 @@ namespace Databox.OdinSerializer
                 return false;
             }
 
-            // Unity does not serialize [Serializable] structs and classes if they are defined in mscorlib
-            if (type.Assembly == typeof(string).Assembly)
+            // Unity does not serialize [Serializable] structs and classes if they are defined in mscorlib, System.dll or System.Core.dll if those are present
+            // Checking against the assemblies that declare System.String, HashSet<T> and LinkedList<T> is a simple way to do this.
+            if (type.Assembly == String_Assembly || type.Assembly == HashSet_Assembly || type.Assembly == LinkedList_Assembly)
             {
                 return false;
             }
@@ -765,9 +780,8 @@ namespace Databox.OdinSerializer
                                 if (data.PrefabModificationsReferencedUnityObjects != null && data.PrefabModificationsReferencedUnityObjects.Count > 0)
                                 {
                                     //var prefabRoot = UnityEditor.PrefabUtility.FindPrefabRoot(((Component)data.Prefab).gameObject);
-                                    //var instanceRoot = UnityEditor.PrefabUtility.FindPrefabRoot(((Component)unityObject).gameObject);
-	                                var instanceRoot = ((Component)unityObject).transform.root.gameObject;
-	                                
+	                                var instanceRoot = UnityEditor.PrefabUtility.GetOutermostPrefabInstanceRoot(((Component)unityObject).gameObject);
+
                                     foreach (var reference in data.PrefabModificationsReferencedUnityObjects)
                                     {
                                         if (reference == null) continue;
@@ -775,9 +789,9 @@ namespace Databox.OdinSerializer
                                         if (UnityEditor.AssetDatabase.Contains(reference)) continue;
 
 	                                    var referencePrefabType = UnityEditor.PrefabUtility.GetPrefabAssetType(reference);
-
-	                                    bool mightBeInPrefab = referencePrefabType == UnityEditor.PrefabAssetType.Model
-		                                    || referencePrefabType == UnityEditor.PrefabAssetType.Regular;
+	                                    
+	                                    bool mightBeInPrefab = referencePrefabType == UnityEditor.PrefabAssetType.Regular
+		                                    || referencePrefabType == UnityEditor.PrefabAssetType.Model;
                                                             //|| referencePrefabType == UnityEditor.PrefabType.ModelPrefab
                                                             //|| referencePrefabType == UnityEditor.PrefabType.ModelPrefabInstance;
 
@@ -799,9 +813,8 @@ namespace Databox.OdinSerializer
                                         }
 
                                         var gameObject = (GameObject)(reference is GameObject ? reference : (reference as Component).gameObject);
-                                        //var referenceRoot = UnityEditor.PrefabUtility.FindPrefabRoot(gameObject);
-	                                    var referenceRoot = gameObject.transform.root.gameObject;
-	                                    
+	                                    var referenceRoot = UnityEditor.PrefabUtility.GetOutermostPrefabInstanceRoot(gameObject);
+
                                         if (referenceRoot != instanceRoot)
                                         {
                                             keep.Add(reference);
@@ -2569,13 +2582,13 @@ namespace Databox.OdinSerializer
                             if (!(n is GameObject)) return false;
 
 	                        var prefabType = UnityEditor.PrefabUtility.GetPrefabAssetType(n);
-	                        return prefabType == UnityEditor.PrefabAssetType.Model
-		                        || prefabType == UnityEditor.PrefabAssetType.Regular;
-                                //|| prefabType == UnityEditor.PrefabType.PrefabInstance
+	              
+	                        return prefabType == UnityEditor.PrefabAssetType.Regular
+		                        || prefabType == UnityEditor.PrefabAssetType.Model
+		                        || prefabType == UnityEditor.PrefabAssetType.Variant;
                                 //|| prefabType == UnityEditor.PrefabType.ModelPrefabInstance;
                         })
-	                    //.Select(n => UnityEditor.PrefabUtility.FindPrefabRoot((GameObject)n))
-	                    .Select(n => ((GameObject)n).transform.root.gameObject)
+	                    .Select(n => UnityEditor.PrefabUtility.GetOutermostPrefabInstanceRoot((GameObject)n))
                         .Distinct();
 
                     foreach (var root in rootPrefabs)

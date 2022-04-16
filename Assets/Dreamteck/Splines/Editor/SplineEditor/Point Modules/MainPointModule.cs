@@ -134,8 +134,11 @@ namespace Dreamteck.Splines.Editor
                 {
                     Handles.Label(points[i].position + Camera.current.transform.up * HandleUtility.GetHandleSize(points[i].position) * 0.3f, (i + 1).ToString());
                 }
-                if (excludeSelected && isSelected) SplineEditorHandles.FreeMoveRectangle(points[i].position, HandleUtility.GetHandleSize(points[i].position) * 0.1f);
-                else  points[i].SetPosition(SplineEditorHandles.FreeMoveRectangle(points[i].position, HandleUtility.GetHandleSize(points[i].position) * 0.1f));
+                if (!eventModule.alt)
+                {
+                    if (excludeSelected && isSelected) SplineEditorHandles.FreeMoveRectangle(points[i].position, HandleUtility.GetHandleSize(points[i].position) * 0.1f);
+                    else points[i].SetPosition(SplineEditorHandles.FreeMoveRectangle(points[i].position, HandleUtility.GetHandleSize(points[i].position) * 0.1f));
+                }
                 
                 if (lastPos != points[i].position)
                 {

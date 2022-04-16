@@ -82,7 +82,7 @@ public class StringListWithIndexType : DataboxType {
 						GUI.color = Color.white;
 					}
 					
-					_lsstring[i] = GUILayout.TextField(_lsstring[i]);
+					_lsstring[i] = GUILayout.TextArea(_lsstring[i]);
 					GUI.color = Color.white;
 					
 					if (GUILayout.Button("-", GUILayout.Width(20)))
@@ -129,7 +129,7 @@ public class StringListWithIndexType : DataboxType {
 						GUI.color = Color.white;
 					}
 					
-					InitValue[i] = GUILayout.TextField(InitValue[i]);
+					InitValue[i] = GUILayout.TextArea(InitValue[i]);
 					GUI.color = Color.white;
 						
 					if (GUILayout.Button("-", GUILayout.Width(20)))

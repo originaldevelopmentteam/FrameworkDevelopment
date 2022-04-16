@@ -1,15 +1,77 @@
+----- 2.12 -----
+SUPPORT: Official 2021.2 support
+
+FEATURE: Custom object positioning rules feature added to the Object Controller (see Manual page 39)
+FEATURE: Added an offset property to the Particle Controller component
+FEATURE: Added Bezier tangent flip and swap operations to the point inspector
+
+FIX: Added a ResampleTransform call to SplineComputer.Awake so that splines created in runtime can be properly initialized without extra steps
+FIX: Fixed an issue with the Node behavior when splines are child objects and the parent is moved
+FIX: Bezier tangents can now be placed on surfaces using the Surface mode of the Movement tool 
+
+
+----- 2.11 -----
+FEATURE: Added new Spacing feature to the Configure Mesh window of the Spline Mesh component
+
+FIX: Fix for SplineComputer.ShiftNodes not preserving point coordinates
+FIX: Fix for Object Controller distance placing mode
+FIX: Fixed null reference in SplineFollower when creating it with AddComponent
+FIX: Fixes to SplineFollower Start Position setting
+
+API: Added ObjectController minObjectDistance and maxObjectDistance public properties
+API: SplineFollower.startPercent is no longer used. Use SplineFollower.SetPercent instead
+API: Added SplineTracer.GetPercent method which returns SplineTracer.result.percent;
+
+
+----- 2.10 -----
+FEATURE: Added option to orient the particles along the spline inside the Particle Controller
+FEATURE: Added 2D features to the Spline Tracers Motion panel - controlling 2D objects is now easier
+FEATURE: Added Create/Delete Node buttons to the Spline Editor when points are selected
+FEATURE: Added an "Extrude Offset" property to the Surface Generator which applies offseting along extrusion splines
+
+FIX: Fixed error "Platform name 'CloudRendering' not supported. Supported" in Unity 2020.2
+FIX: Fixed errors with ASMDEF files on older Unity versions
+FIX: SplinePositioner's position slider can now be easily recorded in Timeline and the Animation panel
+FIX: SampleCollection.Project method accuracy fix
+FIX: Fixed the rotation of Rigidbody2D components when used with a Spline Follower
+FIX: Fixed NullReference execption for Unity events when Spline Followers are created in runtime using AddComponent
+FIX: Fixed Object Controller Min. Scale X affecting the Z scale axis
+FIX: Fixed Undo when creating new points with the "Create Node" option toggled
+
+CHANGE: New Preset serialization system using JSON
+
+----- 2.09 -----
+!!!DELETE THE OLD INSTALLATION BEFORE INSTALLING!!!
+
+FEATURE: The package now comes with Assembly Definition files
+FEATURE: Added color multiplier to the Spline Mesh component
+FEATURE: Added an "Editor Update Mode" setting to the splines that allows for reduced calculations for heavier splines (faster editing)
+FEATURE: Added interface for setting Spline User clip ranges by distance
+FEATURE: The Editor Properties panel is now available for multiple selected splines
+FEATURE: Added option to use custom distance between objects in the Object Controller
+
+FIX: Fixed twitching spline control points in the editor when the spline object is a child of a rotated object
+FIX: Fixed flickering meshes when using multithreading
+FIX: Fixed NaN propagation in SampleCollection.Travel
+FIX: LengthCalculator.AddEvent is now public
+FIX: Fixed Welcome Screen throwing errors in versions 2021 and above
+FIX: Fixed how random offset, scale and rotation is applied to spline mesh channels set to "Extrude"
+FIX: Fixed the SplinePositioner position slider not working with the animator and the timeline
+FIX: Fixed errors when creating spline points with Append mode set to "Beginning" and "Create Node" toggled
+FIX: Holding Alt now prevents points from being selected and dragged
+
+EDITOR: Changed some default values: Spline space default is now "Local", Point append mode default is now "End"
+
+
 ----- 2.08 -----
 FEATURE: New and improved Playmaker actions
 FEATURE: Mesh generators can now use 32 bit buffers to generate very large meshes
 FEATURE: Added a "Don't Lerp Direction" feature to the Spline Tracers
 
-FIX: Fixed issues with Rebuild on awake for all splines and users
+FIX: Fixed issues with Rebuild on awake for alll splines and users
 FIX: Fixed issues with the autoCount property of the SplineMesh component
 FIX: Fixed issue with SplineRenderer not working properly in URP
-FIX: Fixed prefab serialization issues with Nodes not getting set dirty
-
-SUPPORT: Official 2020.3 support
-SUPPORT: Official 2021.1 support
+FIX: Fixed prefab serialization issues with Nodes not setting dirty
 
 ----- 2.07 -----
 FEATURE: Added unity events for SplineFollower.onBeginningReached and SplineFollower.onEndReached assignable from the inspector

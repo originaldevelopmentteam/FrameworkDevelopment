@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="BinaryDataReader.cs" company="Sirenix IVS">
 // Copyright (c) 2018 Sirenix IVS
 //
@@ -437,9 +437,9 @@ namespace Databox.OdinSerializer
             }
             else if (this.peekedBinaryEntryType == BinaryEntryType.NamedStartOfStructNode || this.peekedBinaryEntryType == BinaryEntryType.UnnamedStartOfStructNode)
             {
-                this.MarkEntryContentConsumed();
                 type = this.ReadTypeEntry();
                 this.PushNode(this.peekedEntryName, -1, type);
+                this.MarkEntryContentConsumed();
                 return true;
             }
             else
@@ -1812,13 +1812,13 @@ namespace Databox.OdinSerializer
 
             return "Binary hex dump: " + ProperBitConverter.BytesToHexString(bytes);
         }
-#pragma warning disable 0649
+
         private struct Struct256Bit
         {
             public decimal d1;
             public decimal d2;
         }
-#pragma warning restore 0649
+
         [MethodImpl((MethodImplOptions)0x100)]  // Set aggressive inlining flag, for the runtimes that understand that
         private string ReadStringValue()
         {

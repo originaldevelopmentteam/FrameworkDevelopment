@@ -16,7 +16,7 @@ namespace Databox.Ed
 	    // Start is called before the first frame update
 		public static void DrawCloudConfigUI(DataboxObject database)
 	    {
-		    using (new GUILayout.VerticalScope("Window"))
+		    using (new GUILayout.VerticalScope("Helpbox"))
 		    {
 			    //if (GUILayout.Button("Remove Agreement"))
 			    //{

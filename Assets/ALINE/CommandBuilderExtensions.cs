@@ -820,41 +820,41 @@ namespace Drawing {
 		}
 		/// <summary>\copydocref{Label2D(float3,FixedString32,float)}</summary>
 		/// <param name="color">Color of the object</param>
-		public void Label2D (float3 position, ref FixedString32 text, float sizeInPixels, Color color) {
+		public void Label2D (float3 position, ref FixedString32Bytes text, float sizeInPixels, Color color) {
 			Label2D(position, ref text, sizeInPixels, LabelAlignment.MiddleLeft, color);
 		}
 		/// <summary>\copydocref{Label2D(float3,FixedString32,float)}</summary>
 		/// <param name="color">Color of the object</param>
-		public void Label2D (float3 position, ref FixedString32 text, Color color) {
+		public void Label2D (float3 position, ref FixedString32Bytes text, Color color) {
 			Label2D(position, ref text, 14, color);
 		}
 		/// <summary>\copydocref{Label2D(float3,FixedString64,float)}</summary>
-		public void Label2D (float3 position, ref FixedString64 text, float sizeInPixels, Color color) {
+		public void Label2D (float3 position, ref FixedString64Bytes text, float sizeInPixels, Color color) {
 			Label2D(position, ref text, sizeInPixels, LabelAlignment.MiddleLeft, color);
 		}
 		/// <summary>\copydocref{Label2D(float3,FixedString64,float)}</summary>
-		public void Label2D (float3 position, ref FixedString64 text, Color color) {
+		public void Label2D (float3 position, ref FixedString64Bytes text, Color color) {
 			Label2D(position, ref text, 14, color);
 		}
 		/// <summary>\copydocref{Label2D(float3,FixedString128,float)}</summary>
-		public void Label2D (float3 position, ref FixedString128 text, float sizeInPixels, Color color) {
+		public void Label2D (float3 position, ref FixedString128Bytes text, float sizeInPixels, Color color) {
 			Label2D(position, ref text, sizeInPixels, LabelAlignment.MiddleLeft, color);
 		}
 		/// <summary>\copydocref{Label2D(float3,FixedString128,float)}</summary>
-		public void Label2D (float3 position, ref FixedString128 text, Color color) {
+		public void Label2D (float3 position, ref FixedString128Bytes text, Color color) {
 			Label2D(position, ref text, 14, color);
 		}
 		/// <summary>\copydocref{Label2D(float3,FixedString512,float)}</summary>
-		public void Label2D (float3 position, ref FixedString512 text, float sizeInPixels, Color color) {
+		public void Label2D (float3 position, ref FixedString512Bytes text, float sizeInPixels, Color color) {
 			Label2D(position, ref text, sizeInPixels, LabelAlignment.MiddleLeft, color);
 		}
 		/// <summary>\copydocref{Label2D(float3,FixedString512,float)}</summary>
-		public void Label2D (float3 position, ref FixedString512 text, Color color) {
+		public void Label2D (float3 position, ref FixedString512Bytes text, Color color) {
 			Label2D(position, ref text, 14, color);
 		}
 		/// <summary>\copydocref{Label2D(float3,FixedString32,float,LabelAlignment)}</summary>
 		/// <param name="color">Color of the object</param>
-		public void Label2D (float3 position, ref FixedString32 text, float sizeInPixels, LabelAlignment alignment, Color color) {
+		public void Label2D (float3 position, ref FixedString32Bytes text, float sizeInPixels, LabelAlignment alignment, Color color) {
 			PushColor(color);
 #if MODULE_COLLECTIONS_0_8_0_OR_NEWER
 			unsafe {
@@ -866,7 +866,7 @@ namespace Drawing {
 			PopColor();
 		}
 		/// <summary>\copydocref{Label2D(float3,FixedString64,float,LabelAlignment)}</summary>
-		public void Label2D (float3 position, ref FixedString64 text, float sizeInPixels, LabelAlignment alignment, Color color) {
+		public void Label2D (float3 position, ref FixedString64Bytes text, float sizeInPixels, LabelAlignment alignment, Color color) {
 			PushColor(color);
 #if MODULE_COLLECTIONS_0_8_0_OR_NEWER
 			unsafe {
@@ -878,7 +878,7 @@ namespace Drawing {
 			PopColor();
 		}
 		/// <summary>\copydocref{Label2D(float3,FixedString128,float,LabelAlignment)}</summary>
-		public void Label2D (float3 position, ref FixedString128 text, float sizeInPixels, LabelAlignment alignment, Color color) {
+		public void Label2D (float3 position, ref FixedString128Bytes text, float sizeInPixels, LabelAlignment alignment, Color color) {
 			PushColor(color);
 #if MODULE_COLLECTIONS_0_8_0_OR_NEWER
 			unsafe {
@@ -890,7 +890,7 @@ namespace Drawing {
 			PopColor();
 		}
 		/// <summary>\copydocref{Label2D(float3,FixedString512,float,LabelAlignment)}</summary>
-		public void Label2D (float3 position, ref FixedString512 text, float sizeInPixels, LabelAlignment alignment, Color color) {
+		public void Label2D (float3 position, ref FixedString512Bytes text, float sizeInPixels, LabelAlignment alignment, Color color) {
 			PushColor(color);
 #if MODULE_COLLECTIONS_0_8_0_OR_NEWER
 			unsafe {
@@ -903,24 +903,24 @@ namespace Drawing {
 		}
 		/// <summary>\copydocref{Label3D(float3,quaternion,FixedString32,float)}</summary>
 		/// <param name="color">Color of the object</param>
-		public void Label3D (float3 position, quaternion rotation, ref FixedString32 text, float size, Color color) {
+		public void Label3D (float3 position, quaternion rotation, ref FixedString32Bytes text, float size, Color color) {
 			Label3D(position, rotation, ref text, size, LabelAlignment.MiddleLeft, color);
 		}
 		/// <summary>\copydocref{Label3D(float3,quaternion,FixedString64,float)}</summary>
-		public void Label3D (float3 position, quaternion rotation, ref FixedString64 text, float size, Color color) {
+		public void Label3D (float3 position, quaternion rotation, ref FixedString64Bytes text, float size, Color color) {
 			Label3D(position, rotation, ref text, size, LabelAlignment.MiddleLeft, color);
 		}
 		/// <summary>\copydocref{Label3D(float3,quaternion,FixedString128,float)}</summary>
-		public void Label3D (float3 position, quaternion rotation, ref FixedString128 text, float size, Color color) {
+		public void Label3D (float3 position, quaternion rotation, ref FixedString128Bytes text, float size, Color color) {
 			Label3D(position, rotation, ref text, size, LabelAlignment.MiddleLeft, color);
 		}
 		/// <summary>\copydocref{Label3D(float3,quaternion,FixedString512,float)}</summary>
-		public void Label3D (float3 position, quaternion rotation, ref FixedString512 text, float size, Color color) {
+		public void Label3D (float3 position, quaternion rotation, ref FixedString512Bytes text, float size, Color color) {
 			Label3D(position, rotation, ref text, size, LabelAlignment.MiddleLeft, color);
 		}
 		/// <summary>\copydocref{Label3D(float3,quaternion,FixedString32,float,LabelAlignment)}</summary>
 		/// <param name="color">Color of the object</param>
-		public void Label3D (float3 position, quaternion rotation, ref FixedString32 text, float size, LabelAlignment alignment, Color color) {
+		public void Label3D (float3 position, quaternion rotation, ref FixedString32Bytes text, float size, LabelAlignment alignment, Color color) {
 			PushColor(color);
 #if MODULE_COLLECTIONS_0_8_0_OR_NEWER
 			unsafe {
@@ -932,7 +932,7 @@ namespace Drawing {
 			PopColor();
 		}
 		/// <summary>\copydocref{Label3D(float3,quaternion,FixedString64,float,LabelAlignment)}</summary>
-		public void Label3D (float3 position, quaternion rotation, ref FixedString64 text, float size, LabelAlignment alignment, Color color) {
+		public void Label3D (float3 position, quaternion rotation, ref FixedString64Bytes text, float size, LabelAlignment alignment, Color color) {
 			PushColor(color);
 #if MODULE_COLLECTIONS_0_8_0_OR_NEWER
 			unsafe {
@@ -944,7 +944,7 @@ namespace Drawing {
 			PopColor();
 		}
 		/// <summary>\copydocref{Label3D(float3,quaternion,FixedString128,float,LabelAlignment)}</summary>
-		public void Label3D (float3 position, quaternion rotation, ref FixedString128 text, float size, LabelAlignment alignment, Color color) {
+		public void Label3D (float3 position, quaternion rotation, ref FixedString128Bytes text, float size, LabelAlignment alignment, Color color) {
 			PushColor(color);
 #if MODULE_COLLECTIONS_0_8_0_OR_NEWER
 			unsafe {
@@ -956,7 +956,7 @@ namespace Drawing {
 			PopColor();
 		}
 		/// <summary>\copydocref{Label3D(float3,quaternion,FixedString512,float,LabelAlignment)}</summary>
-		public void Label3D (float3 position, quaternion rotation, ref FixedString512 text, float size, LabelAlignment alignment, Color color) {
+		public void Label3D (float3 position, quaternion rotation, ref FixedString512Bytes text, float size, LabelAlignment alignment, Color color) {
 			PushColor(color);
 #if MODULE_COLLECTIONS_0_8_0_OR_NEWER
 			unsafe {

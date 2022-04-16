@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="BinaryDataWriter.cs" company="Sirenix IVS">
 // Copyright (c) 2018 Sirenix IVS
 //
@@ -1627,13 +1627,13 @@ namespace Databox.OdinSerializer
                 }
             }
         }
-#pragma warning disable 0649
+
         private struct Struct256Bit
         {
             public decimal d1;
             public decimal d2;
         }
-#pragma warning restore 0649
+
         private void WriteStringFast(string value)
         {
             bool needs16BitsPerChar = true;

@@ -2290,22 +2290,22 @@ namespace Drawing {
 		/// <param name="position">Position in 3D space.</param>
 		/// <param name="text">Text to display.</param>
 		/// <param name="sizeInPixels">Size of the text in screen pixels. For large sizes an SDF (signed distance field) font is used and for small sizes a normal font texture is used.</param>
-		public void Label2D (float3 position, ref FixedString32 text, float sizeInPixels = 14) {
+		public void Label2D (float3 position, ref FixedString32Bytes text, float sizeInPixels = 14) {
 			Label2D(position, ref text, sizeInPixels, LabelAlignment.MiddleLeft);
 		}
 
 		/// <summary>\copydocref{Label2D(float3,FixedString32,float)}</summary>
-		public void Label2D (float3 position, ref FixedString64 text, float sizeInPixels = 14) {
+		public void Label2D (float3 position, ref FixedString64Bytes text, float sizeInPixels = 14) {
 			Label2D(position, ref text, sizeInPixels, LabelAlignment.MiddleLeft);
 		}
 
 		/// <summary>\copydocref{Label2D(float3,FixedString32,float)}</summary>
-		public void Label2D (float3 position, ref FixedString128 text, float sizeInPixels = 14) {
+		public void Label2D (float3 position, ref FixedString128Bytes text, float sizeInPixels = 14) {
 			Label2D(position, ref text, sizeInPixels, LabelAlignment.MiddleLeft);
 		}
 
 		/// <summary>\copydocref{Label2D(float3,FixedString32,float)}</summary>
-		public void Label2D (float3 position, ref FixedString512 text, float sizeInPixels = 14) {
+		public void Label2D (float3 position, ref FixedString512Bytes text, float sizeInPixels = 14) {
 			Label2D(position, ref text, sizeInPixels, LabelAlignment.MiddleLeft);
 		}
 
@@ -2331,7 +2331,7 @@ namespace Drawing {
 		/// <param name="text">Text to display.</param>
 		/// <param name="sizeInPixels">Size of the text in screen pixels. For large sizes an SDF (signed distance field) font is used and for small sizes a normal font texture is used.</param>
 		/// <param name="alignment">How to align the text relative to the given position.</param>
-		public void Label2D (float3 position, ref FixedString32 text, float sizeInPixels, LabelAlignment alignment) {
+		public void Label2D (float3 position, ref FixedString32Bytes text, float sizeInPixels, LabelAlignment alignment) {
 #if MODULE_COLLECTIONS_0_8_0_OR_NEWER
 			unsafe {
 				Label2D(position, text.GetUnsafePtr(), text.Length, sizeInPixels, alignment);
@@ -2342,7 +2342,7 @@ namespace Drawing {
 		}
 
 		/// <summary>\copydocref{Label2D(float3,FixedString32,float,LabelAlignment)}</summary>
-		public void Label2D (float3 position, ref FixedString64 text, float sizeInPixels, LabelAlignment alignment) {
+		public void Label2D (float3 position, ref FixedString64Bytes text, float sizeInPixels, LabelAlignment alignment) {
 #if MODULE_COLLECTIONS_0_8_0_OR_NEWER
 			unsafe {
 				Label2D(position, text.GetUnsafePtr(), text.Length, sizeInPixels, alignment);
@@ -2353,7 +2353,7 @@ namespace Drawing {
 		}
 
 		/// <summary>\copydocref{Label2D(float3,FixedString32,float,LabelAlignment)}</summary>
-		public void Label2D (float3 position, ref FixedString128 text, float sizeInPixels, LabelAlignment alignment) {
+		public void Label2D (float3 position, ref FixedString128Bytes text, float sizeInPixels, LabelAlignment alignment) {
 #if MODULE_COLLECTIONS_0_8_0_OR_NEWER
 			unsafe {
 				Label2D(position, text.GetUnsafePtr(), text.Length, sizeInPixels, alignment);
@@ -2364,7 +2364,7 @@ namespace Drawing {
 		}
 
 		/// <summary>\copydocref{Label2D(float3,FixedString32,float,LabelAlignment)}</summary>
-		public void Label2D (float3 position, ref FixedString512 text, float sizeInPixels, LabelAlignment alignment) {
+		public void Label2D (float3 position, ref FixedString512Bytes text, float sizeInPixels, LabelAlignment alignment) {
 #if MODULE_COLLECTIONS_0_8_0_OR_NEWER
 			unsafe {
 				Label2D(position, text.GetUnsafePtr(), text.Length, sizeInPixels, alignment);
@@ -2418,22 +2418,22 @@ namespace Drawing {
 		/// <param name="rotation">Rotation in 3D space.</param>
 		/// <param name="text">Text to display.</param>
 		/// <param name="size">World size of the text. For large sizes an SDF (signed distance field) font is used and for small sizes a normal font texture is used.</param>
-		public void Label3D (float3 position, quaternion rotation, ref FixedString32 text, float size) {
+		public void Label3D (float3 position, quaternion rotation, ref FixedString32Bytes text, float size) {
 			Label3D(position, rotation, ref text, size, LabelAlignment.MiddleLeft);
 		}
 
 		/// <summary>\copydocref{Label3D(float3,quaternion,FixedString32,float)}</summary>
-		public void Label3D (float3 position, quaternion rotation, ref FixedString64 text, float size) {
+		public void Label3D (float3 position, quaternion rotation, ref FixedString64Bytes text, float size) {
 			Label3D(position, rotation, ref text, size, LabelAlignment.MiddleLeft);
 		}
 
 		/// <summary>\copydocref{Label3D(float3,quaternion,FixedString32,float)}</summary>
-		public void Label3D (float3 position, quaternion rotation, ref FixedString128 text, float size) {
+		public void Label3D (float3 position, quaternion rotation, ref FixedString128Bytes text, float size) {
 			Label3D(position, rotation, ref text, size, LabelAlignment.MiddleLeft);
 		}
 
 		/// <summary>\copydocref{Label3D(float3,quaternion,FixedString32,float)}</summary>
-		public void Label3D (float3 position, quaternion rotation, ref FixedString512 text, float size) {
+		public void Label3D (float3 position, quaternion rotation, ref FixedString512Bytes text, float size) {
 			Label3D(position, rotation, ref text, size, LabelAlignment.MiddleLeft);
 		}
 
@@ -2460,7 +2460,7 @@ namespace Drawing {
 		/// <param name="text">Text to display.</param>
 		/// <param name="size">World size of the text. For large sizes an SDF (signed distance field) font is used and for small sizes a normal font texture is used.</param>
 		/// <param name="alignment">How to align the text relative to the given position.</param>
-		public void Label3D (float3 position, quaternion rotation, ref FixedString32 text, float size, LabelAlignment alignment) {
+		public void Label3D (float3 position, quaternion rotation, ref FixedString32Bytes text, float size, LabelAlignment alignment) {
 #if MODULE_COLLECTIONS_0_8_0_OR_NEWER
 			unsafe {
 				Label3D(position, rotation, text.GetUnsafePtr(), text.Length, size, alignment);
@@ -2471,7 +2471,7 @@ namespace Drawing {
 		}
 
 		/// <summary>\copydocref{Label3D(float3,quaternion,FixedString32,float,LabelAlignment)}</summary>
-		public void Label3D (float3 position, quaternion rotation, ref FixedString64 text, float size, LabelAlignment alignment) {
+		public void Label3D (float3 position, quaternion rotation, ref FixedString64Bytes text, float size, LabelAlignment alignment) {
 #if MODULE_COLLECTIONS_0_8_0_OR_NEWER
 			unsafe {
 				Label3D(position, rotation, text.GetUnsafePtr(), text.Length, size, alignment);
@@ -2482,7 +2482,7 @@ namespace Drawing {
 		}
 
 		/// <summary>\copydocref{Label3D(float3,quaternion,FixedString32,float,LabelAlignment)}</summary>
-		public void Label3D (float3 position, quaternion rotation, ref FixedString128 text, float size, LabelAlignment alignment) {
+		public void Label3D (float3 position, quaternion rotation, ref FixedString128Bytes text, float size, LabelAlignment alignment) {
 #if MODULE_COLLECTIONS_0_8_0_OR_NEWER
 			unsafe {
 				Label3D(position, rotation, text.GetUnsafePtr(), text.Length, size, alignment);
@@ -2493,7 +2493,7 @@ namespace Drawing {
 		}
 
 		/// <summary>\copydocref{Label3D(float3,quaternion,FixedString32,float,LabelAlignment)}</summary>
-		public void Label3D (float3 position, quaternion rotation, ref FixedString512 text, float size, LabelAlignment alignment) {
+		public void Label3D (float3 position, quaternion rotation, ref FixedString512Bytes text, float size, LabelAlignment alignment) {
 #if MODULE_COLLECTIONS_0_8_0_OR_NEWER
 			unsafe {
 				Label3D(position, rotation, text.GetUnsafePtr(), text.Length, size, alignment);

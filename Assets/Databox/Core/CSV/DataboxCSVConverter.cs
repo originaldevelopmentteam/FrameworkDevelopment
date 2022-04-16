@@ -225,7 +225,7 @@ public class DataboxCSVConverter
 				// Convert csv string value to DataboxType value
 				_instance.Convert(_entries[e].values[a]);
 
-				_database.AddData(_tableName, _entries[e].entryName, _entries[e].fields[a], _instance as DataboxType);
+				_database.AddDataCSV(_tableName, _entries[e].entryName, _entries[e].fields[a], _instance as DataboxType);
 			}
 		}
 	}
@@ -255,15 +255,14 @@ public class DataboxCSVConverter
 				}
 				
 				
-				
-				
 				var _instance = System.Activator.CreateInstance(_foundType) as DataboxType;
 					
 				// Convert csv string value to DataboxType value
-				_instance.ConvertRow(_entries[e]);
-					
-				_database.AddData(_tableName, _entries[e].entryName,  _entries[e].entryName, _instance as DataboxType);
+				_instance.ConvertRow(_entries[e]);	
+				_database.AddDataCSV(_tableName, _entries[e].entryName,  _entries[e].entryName, _instance as DataboxType);
+			
 			}
+			
 		}
 		else
 		{
@@ -325,7 +324,7 @@ public class DataboxCSVConverter
 					// Convert csv string value to DataboxType value
 					_instance.Convert(_entries[e].values[a]);
 
-					_database.AddData(_tableName, _entries[e].entryName, _entries[e].fields[a], _instance as DataboxType);
+					_database.AddDataCSV(_tableName, _entries[e].entryName, _entries[e].fields[a], _instance as DataboxType);
 				}
 			}
 		}
@@ -398,7 +397,7 @@ public class DataboxCSVConverter
 				// Convert csv string value to DataboxType value
 				_instance.Convert(_entries[e].values[a]);
 					
-				_database.AddData(_tableName, _entries[e].entryName, _entries[e].fields[a], _instance as DataboxType);
+				_database.AddDataCSV(_tableName, _entries[e].entryName, _entries[e].fields[a], _instance as DataboxType);
 			}
 		}
 	}
@@ -453,7 +452,7 @@ public class DataboxCSVConverter
 					
 					_instance.ConvertRow(_entries[e]);
 					
-					_database.AddData(_tableName, _entries[e].entryName, _entries[e].entryName, _instance as DataboxType);
+					_database.AddDataCSV(_tableName, _entries[e].entryName, _entries[e].entryName, _instance as DataboxType);
 				}
 			}
 				
@@ -483,7 +482,7 @@ public class DataboxCSVConverter
 					// Convert csv string value to DataboxType value
 					_instance.ConvertRow(_entries[e]);
 						
-					_database.AddData(_tableName, _entries[e].entryName, _entries[e].entryName, _instance as DataboxType);
+					_database.AddDataCSV(_tableName, _entries[e].entryName, _entries[e].entryName, _instance as DataboxType);
 				}
 			}
 		}
@@ -546,7 +545,7 @@ public class DataboxCSVConverter
 					// Convert csv string value to DataboxType value
 					_instance.Convert(_entries[e].values[a]);
 					
-					_database.AddData(_tableName, _entries[e].entryName, _entries[e].fields[a], _instance as DataboxType);
+					_database.AddDataCSV(_tableName, _entries[e].entryName, _entries[e].fields[a], _instance as DataboxType);
 				}
 			}
 		}

@@ -129,7 +129,10 @@ namespace Dreamteck.Splines.Editor
                     case "SelectAll":
                         e.commandName = "";
                         ClearSelection();
-                        for (int i = 0; i < points.Length; i++) AddPointSelection(i);
+                        for (int i = 0; i < points.Length; i++)
+                        {
+                            AddPointSelection(i);
+                        }
                         e.Use();
                         break;
 
@@ -233,6 +236,12 @@ namespace Dreamteck.Splines.Editor
             SplinePoint[] p = points;
             ArrayUtility.RemoveAt(ref p, index);
             points = p;
+#if DREAMTECK_SPLINES
+            if(editor is DreamteckSplinesEditor)
+            {
+               ((DreamteckSplinesEditor)editor).UpdateSpline();
+            }
+#endif
         }
 
 

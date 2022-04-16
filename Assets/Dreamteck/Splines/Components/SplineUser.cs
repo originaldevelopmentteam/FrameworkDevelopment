@@ -507,12 +507,20 @@ namespace Dreamteck.Splines {
 
         void BuildThreaded()
         {
+            while (postBuild)
+            {
+                //Wait if the main thread is still running post build operations
+            }
             Build();
             postBuild = true;
         }
 
         void ResampleAndBuildThreaded()
         {
+            while (postBuild)
+            {
+                //Wait if the main thread is still running post build operations
+            }
             GetSamples();
             Build();
             postBuild = true;
@@ -798,6 +806,17 @@ namespace Dreamteck.Splines {
                     spline.Subscribe(this);
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns the offset transformed by the sample
+        /// </summary>
+        /// <param name="sample">Source sample</param>
+        /// <param name="localOffset">Local offset to apply</param>
+        /// <returns></returns>
+        protected static Vector3 TransformOffset(SplineSample sample, Vector3 localOffset)
+        {
+            return (sample.right * localOffset.x + sample.up * localOffset.y + sample.forward * localOffset.z) * sample.size;
         }
     }
 }

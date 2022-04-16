@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="UnsafeUtilities.cs" company="Sirenix IVS">
 // Copyright (c) 2018 Sirenix IVS
 //
@@ -309,13 +309,13 @@ namespace Databox.OdinSerializer.Utilities.Unsafe
 
             return byteCount;
         }
-#pragma warning disable 0649
+
         private struct Struct256Bit
         {
             public decimal d1;
             public decimal d2;
         }
-#pragma warning restore 0649
+
         public static unsafe void MemoryCopy(void* from, void* to, int bytes)
         {
             byte* end = (byte*)to + bytes;

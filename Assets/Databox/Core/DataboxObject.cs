@@ -17,7 +17,7 @@ using Databox.Utils;
 
 // DATABOX (c) 2019 by doorfortyfour
 // 
-// Version 1.2.1p1
+// Version 1.2.1p2
 //
 // The databox object handles all relevant data modification methods and also stores the complete database.
 // If you need any support please head over to the official documentation:
@@ -117,7 +117,13 @@ namespace Databox
 		// CONFIG
 		///////////////////
 		[SerializeField]
-		public string savePath;
+		public string savePath
+		{
+			get
+			{
+				return ReturnSavePath(fileName);
+			}
+		}
 		public string fileName;
 		public int selectedApplicationPath;
 		
@@ -249,12 +255,14 @@ namespace Databox
 			{
 				DB.Add(_tableID, new Database());
 			}
+		
 			
 			DatabaseEntry _tempEntry;
 			if (!DB[_tableID].entries.TryGetValue(_entryID, out _tempEntry))
 			{
 				DB[_tableID].entries.Add(_entryID, new DatabaseEntry());
 			}
+
 			
 			Dictionary<System.Type, DataboxType> _tempData;
 			if (!DB[_tableID].entries[_entryID].data.TryGetValue(_valueID, out _tempData))
@@ -264,6 +272,47 @@ namespace Databox
 				DB[_tableID].entries[_entryID].data.Add(_valueID, _tempValue);
 			}
 			
+			return true;
+		}
+		
+		
+		/// <summary>
+		/// Used by CSV Converter. Adds Data of type DataboxType to the Databox object and replaces data if data entry already exists
+		/// </summary>
+		/// <param name="_tableID"></param>
+		/// <param name="_entryID"></param>
+		/// <param name="_valueID"></param>
+		/// <param name="_data"></param>
+		/// <returns></returns>
+		public bool AddDataCSV(string _tableID, string _entryID, string _valueID, DataboxType _data)
+		{
+			Database _tempDB;
+			if (!DB.TryGetValue(_tableID, out _tempDB))
+			{
+				DB.Add(_tableID, new Database());
+			}
+		
+			
+			DatabaseEntry _tempEntry;
+			if (!DB[_tableID].entries.TryGetValue(_entryID, out _tempEntry))
+			{
+				DB[_tableID].entries.Add(_entryID, new DatabaseEntry());
+			}
+
+			
+			Dictionary<System.Type, DataboxType> _tempData;
+			if (!DB[_tableID].entries[_entryID].data.TryGetValue(_valueID, out _tempData))
+			{
+				Dictionary<System.Type, DataboxType> _tempValue = new Dictionary<System.Type, DataboxType>();
+				_tempValue.Add(_data.GetType(), _data);
+				DB[_tableID].entries[_entryID].data.Add(_valueID, _tempValue);
+			}
+			else
+			{
+				// Data already exists. Replace existing
+				RemoveEntry(_tableID, _entryID);
+				AddData(_tableID, _entryID, _valueID, _data);
+			}
 			
 			return true;
 		}
@@ -1081,6 +1130,26 @@ namespace Databox
 			}
 		}
 		
+		/// <summary>
+		/// Load database asynchronous
+		/// use with StartCoroutine();
+		/// </summary>
+		public IEnumerator LoadDatabaseAsync(bool _callEvent, string _fileName)
+		{
+			Task loadTask =	new Task(() => { LoadDatabaseAsyncInternal(_fileName);});
+			loadTask.Start();
+			
+			while (!loadTask.IsCompleted)
+			{
+				yield return null;
+			}
+			
+			if (_callEvent && OnDatabaseLoaded != null && Application.isPlaying)
+			{
+				OnDatabaseLoaded();
+			}
+		}
+		
 		
 		async void LoadDatabaseAsyncInternal( string _fileName)
 		{
@@ -1291,7 +1360,7 @@ namespace Databox
 			}
 			
 			
-			if (_callEvent && OnDatabaseLoaded != null && Application.isPlaying)
+			if (_callEvent && OnDatabaseLoaded != null) // && Application.isPlaying)
 			{
 				OnDatabaseLoaded();
 			}
@@ -1367,7 +1436,7 @@ namespace Databox
 			var _a = (OrderedDictionary<string, Database>)deserialized as OrderedDictionary<string, Database>;
 			DB = _a;
 			
-			if (_callEvent && OnDatabaseLoaded != null && Application.isPlaying)
+			if (_callEvent && OnDatabaseLoaded != null) // && Application.isPlaying)
 			{
 				OnDatabaseLoaded();
 			}

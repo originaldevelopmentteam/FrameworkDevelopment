@@ -29,7 +29,7 @@ namespace Databox.Ed
 			if (selectedOption == 0)
 			{
 				
-				using (new GUILayout.VerticalScope("Window"))
+				using (new GUILayout.VerticalScope("Helpbox"))
 				{
 
 					//GUILayout.Label("Import from GOOGLE");
@@ -122,7 +122,7 @@ namespace Databox.Ed
 			if (selectedOption == 1)
 			{
 			
-				using (new GUILayout.VerticalScope("Window"))
+				using (new GUILayout.VerticalScope("Helpbox"))
 				{
 
 			

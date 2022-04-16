@@ -1065,7 +1065,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label2D (float3 position, ref FixedString32 text, float sizeInPixels = 14) {
+		public static void Label2D (float3 position, ref FixedString32Bytes text, float sizeInPixels = 14) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label2D(position, ref text, sizeInPixels);
@@ -1077,7 +1077,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label2D (float3 position, ref FixedString64 text, float sizeInPixels = 14) {
+		public static void Label2D (float3 position, ref FixedString64Bytes text, float sizeInPixels = 14) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label2D(position, ref text, sizeInPixels);
@@ -1089,7 +1089,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label2D (float3 position, ref FixedString128 text, float sizeInPixels = 14) {
+		public static void Label2D (float3 position, ref FixedString128Bytes text, float sizeInPixels = 14) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label2D(position, ref text, sizeInPixels);
@@ -1101,7 +1101,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label2D (float3 position, ref FixedString512 text, float sizeInPixels = 14) {
+		public static void Label2D (float3 position, ref FixedString512Bytes text, float sizeInPixels = 14) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label2D(position, ref text, sizeInPixels);
@@ -1113,7 +1113,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label2D (float3 position, ref FixedString32 text, float sizeInPixels, LabelAlignment alignment) {
+		public static void Label2D (float3 position, ref FixedString32Bytes text, float sizeInPixels, LabelAlignment alignment) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label2D(position, ref text, sizeInPixels, alignment);
@@ -1125,7 +1125,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label2D (float3 position, ref FixedString64 text, float sizeInPixels, LabelAlignment alignment) {
+		public static void Label2D (float3 position, ref FixedString64Bytes text, float sizeInPixels, LabelAlignment alignment) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label2D(position, ref text, sizeInPixels, alignment);
@@ -1137,7 +1137,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label2D (float3 position, ref FixedString128 text, float sizeInPixels, LabelAlignment alignment) {
+		public static void Label2D (float3 position, ref FixedString128Bytes text, float sizeInPixels, LabelAlignment alignment) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label2D(position, ref text, sizeInPixels, alignment);
@@ -1149,7 +1149,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label2D (float3 position, ref FixedString512 text, float sizeInPixels, LabelAlignment alignment) {
+		public static void Label2D (float3 position, ref FixedString512Bytes text, float sizeInPixels, LabelAlignment alignment) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label2D(position, ref text, sizeInPixels, alignment);
@@ -1161,7 +1161,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label3D (float3 position, quaternion rotation, ref FixedString32 text, float size) {
+		public static void Label3D (float3 position, quaternion rotation, ref FixedString32Bytes text, float size) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label3D(position, rotation, ref text, size);
@@ -1173,7 +1173,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label3D (float3 position, quaternion rotation, ref FixedString64 text, float size) {
+		public static void Label3D (float3 position, quaternion rotation, ref FixedString64Bytes text, float size) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label3D(position, rotation, ref text, size);
@@ -1185,7 +1185,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label3D (float3 position, quaternion rotation, ref FixedString128 text, float size) {
+		public static void Label3D (float3 position, quaternion rotation, ref FixedString128Bytes text, float size) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label3D(position, rotation, ref text, size);
@@ -1197,7 +1197,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label3D (float3 position, quaternion rotation, ref FixedString512 text, float size) {
+		public static void Label3D (float3 position, quaternion rotation, ref FixedString512Bytes text, float size) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label3D(position, rotation, ref text, size);
@@ -1209,7 +1209,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label3D (float3 position, quaternion rotation, ref FixedString32 text, float size, LabelAlignment alignment) {
+		public static void Label3D (float3 position, quaternion rotation, ref FixedString32Bytes text, float size, LabelAlignment alignment) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label3D(position, rotation, ref text, size, alignment);
@@ -1221,7 +1221,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label3D (float3 position, quaternion rotation, ref FixedString64 text, float size, LabelAlignment alignment) {
+		public static void Label3D (float3 position, quaternion rotation, ref FixedString64Bytes text, float size, LabelAlignment alignment) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label3D(position, rotation, ref text, size, alignment);
@@ -1233,7 +1233,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label3D (float3 position, quaternion rotation, ref FixedString128 text, float size, LabelAlignment alignment) {
+		public static void Label3D (float3 position, quaternion rotation, ref FixedString128Bytes text, float size, LabelAlignment alignment) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label3D(position, rotation, ref text, size, alignment);
@@ -1245,7 +1245,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label3D (float3 position, quaternion rotation, ref FixedString512 text, float size, LabelAlignment alignment) {
+		public static void Label3D (float3 position, quaternion rotation, ref FixedString512Bytes text, float size, LabelAlignment alignment) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label3D(position, rotation, ref text, size, alignment);
@@ -2145,7 +2145,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label2D (float3 position, ref FixedString32 text, float sizeInPixels, Color color) {
+		public static void Label2D (float3 position, ref FixedString32Bytes text, float sizeInPixels, Color color) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label2D(position, ref text, sizeInPixels, color);
@@ -2157,7 +2157,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label2D (float3 position, ref FixedString32 text, Color color) {
+		public static void Label2D (float3 position, ref FixedString32Bytes text, Color color) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label2D(position, ref text, color);
@@ -2169,7 +2169,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label2D (float3 position, ref FixedString64 text, float sizeInPixels, Color color) {
+		public static void Label2D (float3 position, ref FixedString64Bytes text, float sizeInPixels, Color color) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label2D(position, ref text, sizeInPixels, color);
@@ -2181,7 +2181,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label2D (float3 position, ref FixedString64 text, Color color) {
+		public static void Label2D (float3 position, ref FixedString64Bytes text, Color color) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label2D(position, ref text, color);
@@ -2193,7 +2193,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label2D (float3 position, ref FixedString128 text, float sizeInPixels, Color color) {
+		public static void Label2D (float3 position, ref FixedString128Bytes text, float sizeInPixels, Color color) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label2D(position, ref text, sizeInPixels, color);
@@ -2205,7 +2205,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label2D (float3 position, ref FixedString128 text, Color color) {
+		public static void Label2D (float3 position, ref FixedString128Bytes text, Color color) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label2D(position, ref text, color);
@@ -2217,7 +2217,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label2D (float3 position, ref FixedString512 text, float sizeInPixels, Color color) {
+		public static void Label2D (float3 position, ref FixedString512Bytes text, float sizeInPixels, Color color) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label2D(position, ref text, sizeInPixels, color);
@@ -2229,7 +2229,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label2D (float3 position, ref FixedString512 text, Color color) {
+		public static void Label2D (float3 position, ref FixedString512Bytes text, Color color) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label2D(position, ref text, color);
@@ -2241,7 +2241,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label2D (float3 position, ref FixedString32 text, float sizeInPixels, LabelAlignment alignment, Color color) {
+		public static void Label2D (float3 position, ref FixedString32Bytes text, float sizeInPixels, LabelAlignment alignment, Color color) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label2D(position, ref text, sizeInPixels, alignment, color);
@@ -2253,7 +2253,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label2D (float3 position, ref FixedString64 text, float sizeInPixels, LabelAlignment alignment, Color color) {
+		public static void Label2D (float3 position, ref FixedString64Bytes text, float sizeInPixels, LabelAlignment alignment, Color color) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label2D(position, ref text, sizeInPixels, alignment, color);
@@ -2265,7 +2265,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label2D (float3 position, ref FixedString128 text, float sizeInPixels, LabelAlignment alignment, Color color) {
+		public static void Label2D (float3 position, ref FixedString128Bytes text, float sizeInPixels, LabelAlignment alignment, Color color) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label2D(position, ref text, sizeInPixels, alignment, color);
@@ -2277,7 +2277,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label2D (float3 position, ref FixedString512 text, float sizeInPixels, LabelAlignment alignment, Color color) {
+		public static void Label2D (float3 position, ref FixedString512Bytes text, float sizeInPixels, LabelAlignment alignment, Color color) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label2D(position, ref text, sizeInPixels, alignment, color);
@@ -2289,7 +2289,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label3D (float3 position, quaternion rotation, ref FixedString32 text, float size, Color color) {
+		public static void Label3D (float3 position, quaternion rotation, ref FixedString32Bytes text, float size, Color color) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label3D(position, rotation, ref text, size, color);
@@ -2301,7 +2301,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label3D (float3 position, quaternion rotation, ref FixedString64 text, float size, Color color) {
+		public static void Label3D (float3 position, quaternion rotation, ref FixedString64Bytes text, float size, Color color) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label3D(position, rotation, ref text, size, color);
@@ -2313,7 +2313,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label3D (float3 position, quaternion rotation, ref FixedString128 text, float size, Color color) {
+		public static void Label3D (float3 position, quaternion rotation, ref FixedString128Bytes text, float size, Color color) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label3D(position, rotation, ref text, size, color);
@@ -2325,7 +2325,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label3D (float3 position, quaternion rotation, ref FixedString512 text, float size, Color color) {
+		public static void Label3D (float3 position, quaternion rotation, ref FixedString512Bytes text, float size, Color color) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label3D(position, rotation, ref text, size, color);
@@ -2337,7 +2337,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label3D (float3 position, quaternion rotation, ref FixedString32 text, float size, LabelAlignment alignment, Color color) {
+		public static void Label3D (float3 position, quaternion rotation, ref FixedString32Bytes text, float size, LabelAlignment alignment, Color color) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label3D(position, rotation, ref text, size, alignment, color);
@@ -2349,7 +2349,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label3D (float3 position, quaternion rotation, ref FixedString64 text, float size, LabelAlignment alignment, Color color) {
+		public static void Label3D (float3 position, quaternion rotation, ref FixedString64Bytes text, float size, LabelAlignment alignment, Color color) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label3D(position, rotation, ref text, size, alignment, color);
@@ -2361,7 +2361,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label3D (float3 position, quaternion rotation, ref FixedString128 text, float size, LabelAlignment alignment, Color color) {
+		public static void Label3D (float3 position, quaternion rotation, ref FixedString128Bytes text, float size, LabelAlignment alignment, Color color) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label3D(position, rotation, ref text, size, alignment, color);
@@ -2373,7 +2373,7 @@ namespace Drawing {
 		/// Warning: This method cannot be used inside of Burst jobs. See job-system (view in online documentation for working links) instead.
 		/// </summary>
 		[BurstDiscard]
-		public static void Label3D (float3 position, quaternion rotation, ref FixedString512 text, float size, LabelAlignment alignment, Color color) {
+		public static void Label3D (float3 position, quaternion rotation, ref FixedString512Bytes text, float size, LabelAlignment alignment, Color color) {
 #if UNITY_EDITOR
 			DrawingManager.Init();
 			builder.Label3D(position, rotation, ref text, size, alignment, color);
