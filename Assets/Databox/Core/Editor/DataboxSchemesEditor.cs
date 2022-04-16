@@ -29,6 +29,26 @@ namespace Databox.Ed
 				CollectAllTypes(); 
 			}
 			
+			// check if type index has been changed due to new types being added
+			for (int s = 0; s < dbSchemes.schemes.Count; s ++)
+			{				
+				for (int u = 0; u < dbSchemes.schemes[s].schemeTypes.Count; u ++)
+				{
+					if (dbSchemes.schemes[s].schemeTypes[u].type != existingTypes[dbSchemes.schemes[s].schemeTypes[u].typeIndex])
+					{
+						CollectAllTypes(); 
+						
+						for (int e = 0; e < existingTypes.Count; e ++)
+						{
+							if (dbSchemes.schemes[s].schemeTypes[u].type == existingTypes[e])
+							{
+								dbSchemes.schemes[s].schemeTypes[u].typeIndex = e;
+							}
+						}
+					}
+				}	
+			}
+				
 			using (new GUILayout.VerticalScope("Window"))
 			{
 			
@@ -41,6 +61,26 @@ namespace Databox.Ed
 				{
 					for (int s = 0; s < dbSchemes.schemes.Count; s ++)
 					{
+						
+						//for (int u = 0; u < dbSchemes.schemes[s].schemeTypes.Count; u ++)
+						//{
+						//	// check if type index has been changed due to new types being added
+						//	for (int e = 0; e < existingTypeNames.Count; e ++)
+						//	{
+						//		if (dbSchemes.schemes[s].schemeTypes[u].type == existingTypeNames[e])
+						//		{
+						//			if (dbSchemes.schemes[s].schemeTypes[u].typeIndex != e)
+						//			{
+						//				// update index
+						//				Debug.Log("update index " + "old: " + dbSchemes.schemes[s].schemeTypes[u].typeIndex + " new: " + e);
+						//				dbSchemes.schemes[s].schemeTypes[u].typeIndex = e;
+						//			}
+						//		}
+						//	}
+						//}				
+										
+										
+										
 						using (new GUILayout.VerticalScope("Box"))
 						{
 							using (new GUILayout.HorizontalScope("Toolbar"))
@@ -101,37 +141,12 @@ namespace Databox.Ed
 												
 										}
 										
+									
 										dbSchemes.schemes[s].schemeTypes[u].typeIndex = EditorGUILayout.Popup("Type:", dbSchemes.schemes[s].schemeTypes[u].typeIndex, existingTypeNames.ToArray());
 										
 										var _newType = existingTypes[dbSchemes.schemes[s].schemeTypes[u].typeIndex];
 										dbSchemes.schemes[s].schemeTypes[u].type = _newType;
 										
-										
-										//if (dbSchemes.schemes[s].schemeTypes[u].type != _newType)
-										//{
-										//	//add new type
-										//	var _returnType = System.Type.GetType(_newType);
-			
-										//	if (_returnType == null)
-										//	{
-										//		foreach (Assembly assembly in  System.AppDomain.CurrentDomain.GetAssemblies())
-										//		{
-										//			System.Type type = assembly.GetType(_newType);
-										//			if(type != null)
-										//			{
-										//				_returnType = type;
-										//			}
-										//		}
-										//	}
-											 
-										//	dbSchemes.schemes[s].schemeTypes[u].defaultData = System.Activator.CreateInstance(_returnType) as DataboxType;
-										//	dbSchemes.schemes[s].schemeTypes[u].type = _newType;
-										//}
-										
-										//if (dbSchemes.schemes[s].schemeTypes[u].defaultData != null)
-										//{
-										//	dbSchemes.schemes[s].schemeTypes[u].defaultData.DrawEditor();
-										//}
 									}
 								} 
 							

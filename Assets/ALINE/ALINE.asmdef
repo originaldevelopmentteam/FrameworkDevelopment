@@ -41,6 +41,11 @@
             "define": "MODULE_COLLECTIONS_0_6_0_OR_NEWER"
         },
         {
+            "name": "com.unity.collections",
+            "expression": "0.8.0-preview",
+            "define": "MODULE_COLLECTIONS_0_8_0_OR_NEWER"
+        },
+        {
             "name": "com.unity.render-pipelines.universal",
             "expression": "0.0.0",
             "define": "MODULE_RENDER_PIPELINES_UNIVERSAL"

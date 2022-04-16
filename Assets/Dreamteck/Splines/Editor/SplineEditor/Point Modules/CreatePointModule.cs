@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
     public class CreatePointModule : PointModule
     {
-        public enum AppendMode { Beginning, End }
+        public enum AppendMode { Beginning = 0, End = 1}
         public enum PlacementMode { YPlane, XPlane, ZPlane, CameraPlane, Surface, Insert }
         public enum NormalMode { Default, LookAtCamera, AlignWithCamera, Calculate, Left, Right, Up, Down, Forward, Back }
         protected PlacementMode placementMode = PlacementMode.YPlane;
@@ -43,7 +43,7 @@ using System.Collections.Generic;
             base.LoadState();
             normalMode = (NormalMode)LoadInt("normalMode");
             placementMode = (PlacementMode)LoadInt("placementMode");
-            appendMode = (AppendMode)LoadInt("appendMode");
+            appendMode = (AppendMode)LoadInt("appendMode", 1);
             offset = LoadFloat("offset");
             surfaceLayerMask = LoadInt("surfaceLayerMask", ~0);
         }
@@ -204,7 +204,11 @@ using System.Collections.Generic;
                     lastCreated = 0;
                 }
             }
-            if (isClosed) newPoints[newPoints.Length - 1] = newPoints[0];
+
+            if (isClosed)
+            {
+                newPoints[newPoints.Length - 1] = newPoints[0];
+            }
             points = newPoints;
             SetPointNormal(lastCreated, createNormal);
             SelectPoint(lastCreated);

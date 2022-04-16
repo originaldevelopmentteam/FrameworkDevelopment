@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -567,7 +567,7 @@ namespace EasyMobile
             internal event Action<Instance, object, EventArgs> ClosedEvent = delegate {};
             private void InternalInvokeClosedEvent(Instance instance, object obj, EventArgs args){if(ClosedEvent != null) ClosedEvent.Invoke(instance, obj, args);}
             internal event Action<Instance, object, AdFailedToLoadEventArgs> FailToLoadEvent = delegate {};
-            private void InternalInvokeFailToLoadEvent(Instance instance, object obj, AdFailedToLoadEventArgs args){if(FailToLoadEvent != null) FailToLoadEvent.Invoke(instance, obj, args);}
+            private void InternalInvokeFailToLoadEvent(Instance instance, object obj, AdFailedToLoadEventArgs args){if(FailToLoadEvent != null) FailToLoadEvent.Invoke(instance, obj, args); Destroy(instance); }
             internal event Action<Instance, object, EventArgs> LoadedEvent = delegate {};
             private void InternalInvokeLoadedEvent(Instance instance, object obj, EventArgs args){if(LoadedEvent != null) LoadedEvent.Invoke(instance, obj, args);}
             internal event Action<Instance, object, EventArgs> OpeningEvent = delegate {};
@@ -697,6 +697,15 @@ namespace EasyMobile
                 private void HandleFailToLoad(object sender, AdFailedToLoadEventArgs e)
                 {
                     FailToLoadEvent.Invoke(this, sender, e);
+
+                    // Reload with some cool-down to avoid possible
+                    // stackoverflowing issues that may lead to a crash.
+                    RuntimeHelper.RunCoroutine(CRLoad(10f));  // reload after 10s
+                }
+
+                private IEnumerator CRLoad(float delay)
+                {
+                    yield return new WaitForSeconds(delay);
                     Load();
                 }
 
@@ -747,9 +756,9 @@ namespace EasyMobile
             public event Action<Instance,object, EventArgs> AdLoadedEvent = delegate {};
             private void InternalInvokeAdLoadedEvent(Instance instance, object obj, EventArgs args){if(AdLoadedEvent != null) AdLoadedEvent.Invoke(instance, obj, args);}
             public event Action<Instance,object, AdErrorEventArgs> FailToShowEvent = delegate {};
-            private void InternalInvokeFailToShowEvent(Instance instance, object obj, AdErrorEventArgs args){if(FailToShowEvent != null) FailToShowEvent.Invoke(instance, obj, args);}
+            private void InternalInvokeFailToShowEvent(Instance instance, object obj, AdErrorEventArgs args){if(FailToShowEvent != null) FailToShowEvent.Invoke(instance, obj, args); Destroy(instance);}
             public event Action<Instance,object, AdFailedToLoadEventArgs> FailToLoadEvent = delegate {};
-            private void InternalInvokeFailToLoadEvent(Instance instance, object obj, AdFailedToLoadEventArgs args){if(FailToLoadEvent != null) FailToLoadEvent.Invoke(instance, obj, args);}
+            private void InternalInvokeFailToLoadEvent(Instance instance, object obj, AdFailedToLoadEventArgs args){if(FailToLoadEvent != null) FailToLoadEvent.Invoke(instance, obj, args); Destroy(instance);}
             public event Action<Instance,object, EventArgs> RecordImpressionEvent = delegate {};
             private void InternalInvokeRecordImpressionEvent(Instance instance, object obj, EventArgs args){if(RecordImpressionEvent != null) RecordImpressionEvent.Invoke(instance, obj, args);}
             public event Action<Instance,object, EventArgs> ClosedEvent = delegate {};
@@ -844,6 +853,7 @@ namespace EasyMobile
 
                 internal override void Destroy()
                 {
+                    Shown = true;
                     if(interstitialAd != null)
                     {
                         interstitialAd.Destroy();
@@ -896,7 +906,6 @@ namespace EasyMobile
                 {
                     FailToLoadEvent.Invoke(this, sender, e);
                     Destroy();
-                    Load();
                 }
 
                 private void HandleRecordImpression(object sender, EventArgs e)
@@ -944,9 +953,9 @@ namespace EasyMobile
             public event Action<Instance,object, EventArgs> AdLoadedEvent = delegate {};
             private void InternalInvokeAdLoadedEvent(Instance instance, object obj, EventArgs args){if(AdLoadedEvent != null) AdLoadedEvent.Invoke(instance, obj, args);}
             public event Action<Instance,object, AdErrorEventArgs> FailToShowEvent = delegate {};
-            private void InternalInvokeFailToShowEvent(Instance instance, object obj, AdErrorEventArgs args){if(FailToShowEvent != null) FailToShowEvent.Invoke(instance, obj, args);}
+            private void InternalInvokeFailToShowEvent(Instance instance, object obj, AdErrorEventArgs args){if(FailToShowEvent != null) FailToShowEvent.Invoke(instance, obj, args); Destroy(instance);}
             public event Action<Instance,object, AdFailedToLoadEventArgs> FailToLoadEvent = delegate {};
-            private void InternalInvokeFailToLoadEvent(Instance instance, object obj, AdFailedToLoadEventArgs args){if(FailToLoadEvent != null) FailToLoadEvent.Invoke(instance, obj, args);}
+            private void InternalInvokeFailToLoadEvent(Instance instance, object obj, AdFailedToLoadEventArgs args){if(FailToLoadEvent != null) FailToLoadEvent.Invoke(instance, obj, args); Destroy(instance);}
             public event Action<Instance,object, EventArgs> RecordImpressionEvent = delegate {};
             private void InternalInvokeRecordImpressionEvent(Instance instance, object obj, EventArgs args){if(RecordImpressionEvent != null) RecordImpressionEvent.Invoke(instance, obj, args);}
             public event Action<Instance,object, EventArgs> ClosedEvent = delegate {};
@@ -1057,8 +1066,12 @@ namespace EasyMobile
 
                 internal override void Destroy()
                 {
+                    Shown = true;
                     if(rewardedAd != null)
+                    {
                         rewardedAd.Destroy();
+                        rewardedAd = null;
+                    }
                 }
 
                 internal override void Load()
@@ -1101,7 +1114,6 @@ namespace EasyMobile
                 {
                     FailToLoadEvent.Invoke(this, sender, e);
                     Destroy();
-                    Load();
                 }
 
                 private void HandleRecordImpression(object sender, EventArgs e)
@@ -1111,6 +1123,9 @@ namespace EasyMobile
 
                 private void HandleClosed(object sender, EventArgs e)
                 {
+                    #if UNITY_EDITOR
+                    HandleRewardEvent(sender, new Reward());
+                    #endif
                     ClosedEvent.Invoke(this, sender, e);
                     if(Rewarded)
                         Completed.Invoke(this);
@@ -1155,9 +1170,9 @@ namespace EasyMobile
             internal event Action<Instance> AdLoadedEvent = delegate {};
             private void InternalInvokeAdLoadedEvent(Instance instance){if(AdLoadedEvent != null) AdLoadedEvent.Invoke(instance);}
             internal event Action<Instance,object, AdErrorEventArgs> FailToShowEvent = delegate {};
-            private void InternalInvokeFailToShowEvent(Instance instance, object obj, AdErrorEventArgs args){if(FailToShowEvent != null) FailToShowEvent.Invoke(instance, obj, args);}
+            private void InternalInvokeFailToShowEvent(Instance instance, object obj, AdErrorEventArgs args){if(FailToShowEvent != null) FailToShowEvent.Invoke(instance, obj, args); Destroy(instance);}
             internal event Action<Instance, AdFailedToLoadEventArgs> FailToLoadEvent = delegate {};
-            private void InternalInvokeFailToLoadEvent(Instance instance, AdFailedToLoadEventArgs args){if(FailToLoadEvent != null) FailToLoadEvent.Invoke(instance, args);}
+            private void InternalInvokeFailToLoadEvent(Instance instance, AdFailedToLoadEventArgs args){if(FailToLoadEvent != null) FailToLoadEvent.Invoke(instance, args); Destroy(instance);}
             internal event Action<Instance,object, EventArgs> RecordImpressionEvent = delegate {};
             private void InternalInvokeRecordImpressionEvent(Instance instance, object obj, EventArgs args){if(RecordImpressionEvent != null) RecordImpressionEvent.Invoke(instance, obj, args);}
             internal event Action<Instance,object, EventArgs> ClosedEvent = delegate {};
@@ -1271,8 +1286,12 @@ namespace EasyMobile
 
                 internal override void Destroy()
                 {
+                    Shown = true;
                     if(rewardedAd != null)
+                    {
                         rewardedAd.Destroy();
+                        rewardedAd = null;
+                    }
                 }
 
                 internal override void Load()
@@ -1317,7 +1336,6 @@ namespace EasyMobile
                 {
                     FailToLoadEvent.Invoke(this, e);
                     Destroy();
-                    Load();
                 }
 
                 private void HandleRecordImpression(object sender, EventArgs e)
@@ -1327,6 +1345,9 @@ namespace EasyMobile
 
                 private void HandleClosed(object sender, EventArgs e)
                 {
+                    #if UNITY_EDITOR
+                    HandleRewardEvent(new Reward());
+                    #endif
                     ClosedEvent.Invoke(this, sender, e);
                     if(Rewarded)
                         Completed.Invoke(this);

@@ -9,7 +9,9 @@ namespace Drawing {
 	/// </summary>
 	public abstract class MonoBehaviourGizmos : MonoBehaviour, IDrawGizmos {
 		public MonoBehaviourGizmos() {
+#if UNITY_EDITOR
 			DrawingManager.Register(this);
+#endif
 		}
 
 		// Why an empty OnDrawGizmos method?

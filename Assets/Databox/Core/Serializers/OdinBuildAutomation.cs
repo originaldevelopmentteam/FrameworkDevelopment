@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+﻿#if UNITY_EDITOR && NET_4_6
 namespace Databox.OdinSerializer.Utilities.Editor
 {
 	using Databox.OdinSerializer.Editor;
@@ -116,7 +116,11 @@ namespace Databox.OdinSerializer.Utilities.Editor
 						types.Add(typeof(Databox.Dictionary.OrderedDictionary<string, DataboxObject.Database>));
 						types.Add(typeof(Databox.DataboxObject.Database));
 						types.Add(typeof(System.Collections.Generic.KeyValuePair<string, DataboxObject.Database>));
-						
+						types.Add(typeof(Databox.Utils.SerializableVector2));
+						types.Add(typeof(Databox.Utils.SerializableVector3));
+						types.Add(typeof(Databox.Utils.SerializableVector4));
+						types.Add(typeof(Databox.Utils.SerializableQuaternion));
+
 						AOTSupportUtilities.GenerateDLL(GenerateAssembliesDir, "DataboxOdinAOTSupport", types);
 					}
 				}

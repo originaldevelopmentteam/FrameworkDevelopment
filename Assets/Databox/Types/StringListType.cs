@@ -51,7 +51,7 @@ public class StringListType : DataboxType {
 				using (new GUILayout.HorizontalScope())
 				{
 					
-					_lsstring[i] = GUILayout.TextField(_lsstring[i]);
+					_lsstring[i] = GUILayout.TextArea(_lsstring[i]);
 					
 				
 					if (GUILayout.Button("-", GUILayout.Width(20)))
@@ -81,7 +81,7 @@ public class StringListType : DataboxType {
 				using (new GUILayout.HorizontalScope())
 				{
 					
-					InitValue[i] = GUILayout.TextField(InitValue[i]);
+					InitValue[i] = GUILayout.TextArea(InitValue[i]);
 						
 					if (GUILayout.Button("-", GUILayout.Width(20)))
 					{

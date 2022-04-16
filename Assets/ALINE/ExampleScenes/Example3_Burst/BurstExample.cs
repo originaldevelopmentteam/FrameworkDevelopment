@@ -50,13 +50,14 @@ namespace Drawing.Examples {
 			builder.Preallocate(100 * 100 * 400);
 
 			// Create a new job struct and schedule it using the Unity Job System
-			new DrawingJob {
+			var job = new DrawingJob {
 				builder = builder,
 				offset = new float2(Time.time * 0.2f, Time.time * 0.2f),
-			}.Schedule().Complete();
-
+			}.Schedule();
 			// Dispose the builder after the job is complete
-			builder.Dispose();
+			builder.DisposeAfter(job);
+
+			job.Complete();
 		}
 	}
 }

@@ -99,9 +99,7 @@ namespace Dreamteck.Splines
         internal static readonly object locker = new object();
         static SplineThreading()
         {
-#if UNITY_2018_1_OR_NEWER
             Application.quitting += Quitting;
-#endif
             for (int i = 0; i < threads.Length; i++)
             {
                 threads[i] = new ThreadDef();

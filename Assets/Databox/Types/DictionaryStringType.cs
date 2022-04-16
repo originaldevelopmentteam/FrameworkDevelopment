@@ -51,9 +51,9 @@ public class DictionaryStringType : DataboxType {
 			using (new GUILayout.HorizontalScope())
 			{
 				GUILayout.Label("Key:");
-				keyValue = GUILayout.TextField(keyValue);
+				keyValue = GUILayout.TextArea(keyValue);
 				GUILayout.Label("Value:");
-				stringValue = GUILayout.TextField(stringValue);
+				stringValue = GUILayout.TextArea(stringValue);
 			}
 			
 			if (GUILayout.Button("add entry"))
@@ -65,15 +65,30 @@ public class DictionaryStringType : DataboxType {
 			{
 				using (new GUILayout.HorizontalScope())
 				{
+				
 					GUILayout.Label("Key:");
 					GUILayout.Label(key);
 					GUILayout.Label("Value:");
-					GUILayout.Label(_dicstring[key]);
+#if UNITY_EDITOR
+					UnityEditor.EditorGUI.BeginChangeCheck();
+	
+					var _temp = _dicstring[key];
+					_temp = GUILayout.TextArea(_temp);
 					
+					if (UnityEditor.EditorGUI.EndChangeCheck())
+					{
+						_dicstring[key] = _temp;
+					}
+#else
+					
+					GUILayout.TextArea(_dicstring[key]);
+
+#endif
 					if (GUILayout.Button("-", GUILayout.Width(20)))
 					{
 						_dicstring.Remove(key);
 					}
+					
 				}
 			}
 		}
@@ -90,9 +105,9 @@ public class DictionaryStringType : DataboxType {
 			using (new GUILayout.HorizontalScope())
 			{
 				GUILayout.Label("Key:");
-				initKeyValue = GUILayout.TextField(initKeyValue);
+				initKeyValue = GUILayout.TextArea(initKeyValue);
 				GUILayout.Label("Value:");
-				initStringValue = GUILayout.TextField(initStringValue);
+				initStringValue = GUILayout.TextArea(initStringValue);
 			}
 			
 			if (GUILayout.Button("add entry"))
@@ -107,7 +122,22 @@ public class DictionaryStringType : DataboxType {
 					GUILayout.Label("Key:");
 					GUILayout.Label(key);
 					GUILayout.Label("Value:");
-					GUILayout.Label(InitValue[key]);
+					
+#if UNITY_EDITOR
+					UnityEditor.EditorGUI.BeginChangeCheck();
+	
+					var _temp = InitValue[key];
+					_temp = GUILayout.TextArea(_temp);
+					
+					if (UnityEditor.EditorGUI.EndChangeCheck())
+					{
+						InitValue[key] = _temp;
+					}				
+#else
+
+					GUILayout.TextArea(InitValue[key]);
+					
+#endif
 					
 					if (GUILayout.Button("-", GUILayout.Width(20)))
 					{

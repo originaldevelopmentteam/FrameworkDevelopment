@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="FormatterUtilities.cs" company="Sirenix IVS">
 // Copyright (c) 2018 Sirenix IVS
 //
@@ -59,9 +59,8 @@ namespace Databox.OdinSerializer
             typeof(Guid)
         };
 
-#pragma warning disable 0649
         private static readonly FieldInfo UnityObjectRuntimeErrorStringField;
-#pragma warning restore 0649
+
         private const string UnityObjectRuntimeErrorString =
 @"The variable nullValue of {0} has not been assigned.
 You probably need to assign the nullValue variable of the {0} script in the inspector.";

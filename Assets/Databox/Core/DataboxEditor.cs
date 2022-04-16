@@ -139,6 +139,9 @@ namespace Databox.Ed
 		static int selectedScheme = -1;
 		static bool updateScheme = false;
 		
+		static System.Collections.Generic.Dictionary<string, System.Type> cachedTypes = new Dictionary<string, System.Type>();
+	
+	
 		// Runtime editor
 		public static void DrawEditorRuntime(DataboxObject _db, GUISkin _skin, bool _disableInspector, bool _disableDeleteOption, bool _disableConfigurationOption, bool _disableCloudOption, bool _editorWindowOpen)
 		{
@@ -251,14 +254,54 @@ namespace Databox.Ed
 			}
 		}
 		
+		static void LoadMenu()
+		{
+			cachedTypes = new Dictionary<string, System.Type>();
+			database.LoadDatabase(false);
+		}
+		
+		static void SaveMenu()
+		{
+			database.SaveDatabase();
+		}
+		
+		#if UNITY_EDITOR
+		static void GenerateKeysMenu()
+		{
+			var _staticStringFilePath = EditorUtility.SaveFilePanel("Save key file to:", "Assets", database.name + "_KEYS", "cs");
+					
+			if (_staticStringFilePath.Length != 0)
+			{
+				var _result = DataboxGenerateKeys.GenerateStaticStrings(database);
+				System.IO.File.WriteAllText(_staticStringFilePath, _result);
+						
+				AssetDatabase.Refresh();
+			}
+			GUIUtility.ExitGUI();
+		}
+		#endif
 		
 		static void DrawToolbar()
 		{
 			
 			using (new GUILayout.HorizontalScope("Box"))
 			{
+				#if UNITY_EDITOR
+				if (GUILayout.Button(EditorGUIUtility.IconContent("d__Menu")))
+				{
+					GenericMenu menu = new GenericMenu();
+					
+					menu.AddItem(new GUIContent("Load"), false, LoadMenu);
+					menu.AddItem(new GUIContent("Save"), false, SaveMenu);
+					menu.AddSeparator("");
+					menu.AddItem(new GUIContent("Generate Keys"), false, GenerateKeysMenu);
+					
+					menu.ShowAsContext();
+				}
+				#else
 				if (GUILayout.Button("Load", GUILayout.Width(100)))
 				{
+					cachedTypes = new Dictionary<string, System.Type>();
 					database.LoadDatabase(false);
 				}
 				
@@ -266,22 +309,22 @@ namespace Databox.Ed
 				{
 					database.SaveDatabase();
 				}
-				
-				#if UNITY_EDITOR
-				if (GUILayout.Button("Generate KEYS", GUILayout.Width(110)))
-				{
-					var _staticStringFilePath = EditorUtility.SaveFilePanel("Save key file to:", "Assets", database.name + "_KEYS", "cs");
-					
-					if (_staticStringFilePath.Length != 0)
-					{
-						var _result = DataboxGenerateKeys.GenerateStaticStrings(database);
-						System.IO.File.WriteAllText(_staticStringFilePath, _result);
-						
-						AssetDatabase.Refresh();
-					}
-					GUIUtility.ExitGUI();
-				}
 				#endif
+				//#if UNITY_EDITOR
+				//if (GUILayout.Button("Generate KEYS", GUILayout.Width(110)))
+				//{
+				//	var _staticStringFilePath = EditorUtility.SaveFilePanel("Save key file to:", "Assets", database.name + "_KEYS", "cs");
+					
+				//	if (_staticStringFilePath.Length != 0)
+				//	{
+				//		var _result = DataboxGenerateKeys.GenerateStaticStrings(database);
+				//		System.IO.File.WriteAllText(_staticStringFilePath, _result);
+						
+				//		AssetDatabase.Refresh();
+				//	}
+				//	GUIUtility.ExitGUI();
+				//}
+				//#endif
 				
 				GUILayout.FlexibleSpace();
 				
@@ -325,8 +368,8 @@ namespace Databox.Ed
 				#if UNITY_EDITOR
 				if (GUILayout.Button(EditorGUIUtility.IconContent(editorIconNewWindow)))
 				{
-					DataboxObjectEditorWindow.dbObject = database;
-					DataboxObjectEditorWindow.Init();		
+					DataboxObjectEditorInspector.dbObject = database;
+					DataboxObjectEditorInspector.Init();		
 				}
 				#endif
 			}
@@ -335,7 +378,7 @@ namespace Databox.Ed
 			if (configOpen)
 			{
 				
-				using (new GUILayout.VerticalScope("Window"))
+				using (new GUILayout.VerticalScope("Helpbox"))
 				{
 					
 					#if DATABOX_LOCALIZATION && UNITY_EDITOR
@@ -498,24 +541,24 @@ namespace Databox.Ed
 						
 						
 							
-							if (!string.IsNullOrEmpty(database.fileName))
-							{
-								switch (database.selectedApplicationPath)
-								{
-								case 0:
-									database.savePath = System.IO.Path.Combine(Application.persistentDataPath, database.fileName);
-									break;
-								case 1:
-									database.savePath = System.IO.Path.Combine(Application.streamingAssetsPath, database.fileName);
-									break;
-								case 2: 
-									database.savePath = "Resources/" + database.fileName;
-									break;
-								case 3:
-									database.savePath = "Key: " + database.fileName;
-									break;
-								}
-							}
+							//if (!string.IsNullOrEmpty(database.fileName))
+							//{
+							//	switch (database.selectedApplicationPath)
+							//	{
+							//	case 0:
+							//		database.savePath = System.IO.Path.Combine(Application.persistentDataPath, database.fileName);
+							//		break;
+							//	case 1:
+							//		database.savePath = System.IO.Path.Combine(Application.streamingAssetsPath, database.fileName);
+							//		break;
+							//	case 2: 
+							//		database.savePath = "Resources/" + database.fileName;
+							//		break;
+							//	case 3:
+							//		database.savePath = "Key: " + database.fileName;
+							//		break;
+							//	}
+							//}
 						}
 					
 					}
@@ -1777,34 +1820,38 @@ namespace Databox.Ed
 									}
 								}
 								
-								if (allTypes == null || allTypes.Count == 0 || allTypesNames == null || allTypesNames.Count == 0)
-								{
-									GetDataTypes(out allTypes, out allTypesNames);
-								}
+								//if (allTypes == null || allTypes.Count == 0 || allTypesNames == null || allTypesNames.Count == 0)
+								//{
+								//	GetDataTypes(out allTypes, out allTypesNames);
+								//}
 								
 								if ((database.collapsedView && selectedFoldout == entry) || !database.collapsedView)
 								{
-									//Debug.Log(database.collapsedView + " " + selectedFoldout + " " + entry);
+									//Debug.Log(selectedDatabaseTable + " " + entry);
 									foreach (var dataKey in database.DB[selectedDatabaseTable].entries[entry].data.Keys)
 									{
 										var _databaseType = database.DB[selectedDatabaseTable].entries[entry].data[dataKey];
+										var _dbtype = _databaseType.FirstOrDefault().Value;
 										
 										using (new GUILayout.VerticalScope())
 										{
-											for (int i = 0; i < allTypes.Count; i ++)
-											{	
+											//for (int i = 0; i < allTypes.Count; i ++)
+											//{	
 												
 												DataboxType _dataType;
 												System.Type _type = null;
 												try
 												{
-													_type = GetTypeFromString(allTypes[i]);												
+										
+													_type = GetTypeFromString(_dbtype.GetType().Name.ToString());												
 													//_type = System.Type.GetType(allTypes[i]);
 												}
 												catch
 												{
-													Debug.LogError("Databox: Could not find type of " + allTypes[i]);
+													Debug.LogError("Databox: Could not find type of " + _dbtype.GetType().Name.ToString());
 												}
+												
+										
 											
 												if (_databaseType.TryGetValue(_type, out _dataType))
 												{
@@ -1942,7 +1989,7 @@ namespace Databox.Ed
 													}
 												}
 											
-											}
+											//}
 										}
 									}
 								}
@@ -2324,19 +2371,41 @@ namespace Databox.Ed
 		// 
 		private static System.Type GetTypeFromString(string _typeName)
 		{
-			var _returnType = System.Type.GetType(_typeName);
 			
-			if (_returnType == null)
+			if (!cachedTypes.ContainsKey(_typeName))
 			{
-				foreach (Assembly assembly in  System.AppDomain.CurrentDomain.GetAssemblies())
+				var _returnType = System.Type.GetType(_typeName);
+				
+				if (_returnType == null)
 				{
-					System.Type type = assembly.GetType(_typeName);
-					if(type != null)
-						return type;
+					//foreach (Assembly assembly in  System.AppDomain.CurrentDomain.GetAssemblies())
+					//{
+					//	Debug.Log(assembly.FullName);
+					//	System.Type type = assembly.GetType(_typeName, false, true);
+					//	if(type != null)
+					//	{
+					//		return type;
+					//	}
+					//}
+					
+					var types = System.AppDomain.CurrentDomain.GetAllDerivedTypes(typeof(DataboxType));
+					foreach(var type in types)
+					{
+						if (type.FullName.Contains(_typeName))
+						{
+							_returnType = type;
+						}
+						
+					}
 				}
-			}
 
-			return _returnType;
+				cachedTypes.Add(_typeName, _returnType);
+				return _returnType;
+			}
+			else
+			{
+				return cachedTypes[_typeName];
+			}
 		}
 		
 		

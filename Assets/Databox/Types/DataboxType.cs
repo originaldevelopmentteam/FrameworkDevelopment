@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEditor;
+#if NET_4_6
 using Databox.OdinSerializer;
+#endif
 
 namespace Databox
 {

@@ -1,3 +1,45 @@
+## 1.5.2 (2021-11-09)
+    - Fix gizmos would not show up until you selected the camera if you had just switched to the universal render pipeline.
+    - Improved performance of drawing lines by more efficiently sending the data to the shader.
+        This has the downside that shader target 4.5 is now required. I don't think this should be a big deal nowadays, but let me know if things don't work on your platform.
+        This was originally introduced in 1.5.0, but reverted in 1.5.1 due to some compatibility issues causing rendering to fail for some project configurations. I think those issues should be resolved now.
+
+## 1.5.1 (2021-10-28)
+    - Reverted "Improved performance of drawing lines by more efficiently sending the data to the shader." from 1.5.0.
+        It turns out this caused issues for some users and could result in gizmos not showing at all.
+        I'll try to figure out a solution and bring the performance improvements back.
+
+## 1.5 (2021-10-27)
+    - Added support FixedStrings in \reflink{Draw.Label2D(float3,FixedString32,float)}, which means it can be used inside burst jobs (C# managed strings cannot be used in burst jobs).
+    - Fixed a 'NativeArray has not been disposed' error message that could show up if the whole project's assets were re-imported.
+    - Added \reflink{Draw.SolidCircle}.
+       \shadowimage{rendered/solidcircle.png}
+    - Added \reflink{Draw.SolidCircleXZ}.
+       \shadowimage{rendered/solidcirclexz.png}
+    - Added \reflink{Draw.SolidArc}.
+       \shadowimage{rendered/solidarc.png}
+    - Added \reflink{Draw.Label3D}
+        \shadowimage{rendered/label3d.png}
+    - Improved performance of drawing lines by more efficiently sending the data to the shader.
+        This has the downside that shader target 4.5 is now required. I don't think this should be a big deal nowadays, but let me know if things don't work on your platform.
+    - Improved performance of \reflink{Draw.WirePlane} and \reflink{Draw.WireRectangle} by making them primitives instead of just calling \reflink{Draw.Line} 4 times.
+    - Improved performance in general by more efficiently re-using existing vertex buffers.
+    - Fixed some warnings related to ENABLE_UNITY_COLLECTIONS_CHECKS which burst would log when building a standalone player.
+    - Changed more functions in the \reflink{Draw} class to take a Unity.Mathematics.quaternion instead of a UnityEngine.Quaternion.
+        Implicit conversions exist in both directions, so there is no need to change your code.
+
+## 1.4.3 (2021-09-04)
+    - Fixed some debug printout had been included by mistake. A "Disposing" message could sometimes show up in the console.
+
+## 1.4.2 (2021-08-22)
+    - Reduced overhead in standalone builds if you have many objects in the scene.
+    - Fixed \reflink{Draw.WireCapsule(float3,float3,float)} could render incorrectly if the start and end parameters were identical.
+    - Fixed \reflink{Draw.WithDuration} scopes could survive until the next time the game started if no game or scene cameras were ever rendered while in edit mode.
+    - Added \reflink{Draw.SphereOutline(float3,float)}.
+       \shadowimage{rendered/sphereoutline.png}
+    - \reflink{Draw.WireSphere(float3,float)} has changed to always include an outline of the sphere. This makes it a lot nicer to look at.
+       \shadowimage{rendered/wiresphere.png}
+
 ## 1.4.1 (2021-02-28)
     - Added \reflink{CommandBuilder.DisposeAfter} to dispose a command builder after a job has completed.
     - Fixed gizmos would be rendered for other objects when the scene view was in prefab isolation mode. Now they will be hidden, which matches what Unity does.
@@ -11,7 +53,7 @@
             This method has been changed so that it now matches the documentation as this was the intended behavior all along.
             The documentation and parameter names have also been clarified.
     - Added \reflink{Draw.SolidRectangle(Rect)}.
-    - Fixed \reflink{Draw.SolidBox(float3,Quaternion,float3)} and \reflink{Draw.WireBox(float3,Quaternion,float3)} rendered a box that was offset by 0.5 times the size of the box.
+    - Fixed \reflink{Draw.SolidBox(float3,quaternion,float3)} and \reflink{Draw.WireBox(float3,quaternion,float3)} rendered a box that was offset by 0.5 times the size of the box.
         This bug only applied to the overload with a rotation, not for example to \reflink{Draw.SolidBox(float3,float3)}.
     - Fixed Draw.SolidMesh would always be rendered at the world origin with a white color. Now it picks up matrices and colors properly.
     - Fixed a bug which could cause a greyed out object called 'RetainedGizmos' to appear in the scene hierarchy.

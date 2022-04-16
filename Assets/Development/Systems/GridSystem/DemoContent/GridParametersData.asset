@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: GridParametersData
+  m_EditorClassIdentifier: InteractiveGrid:Systems.GridSystem.DataStructures:GridParametersData
+  visualizerParameters:
+    cellsColor: {r: 0.91139567, g: 1, b: 0.19339621, a: 1}
+  gridCellSize: {x: 1, y: 1, z: 1}
+  cellsDistance: 1
+  gridDimensions: {x: 20, y: 20, z: 20}

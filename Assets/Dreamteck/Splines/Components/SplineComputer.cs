@@ -11,17 +11,20 @@ namespace Dreamteck.Splines
     public partial class SplineComputer : MonoBehaviour
     {
 #if UNITY_EDITOR
+        public enum EditorUpdateMode { Default, OnMouseUp }
         [HideInInspector]
         public Color editorPathColor = Color.white;
         [HideInInspector]
-        public bool alwaysDraw = false;
+        public bool editorAlwaysDraw = false;
         [HideInInspector]
-        public bool drawThinckness = false;
+        public bool editorDrawThickness = false;
         [HideInInspector]
-        public bool billboardThickness = true;
-        private bool isPlaying = false;
+        public bool editorBillboardThickness = true;
+        private bool _isPlaying = false;
         [HideInInspector]
         public bool isNewlyCreated = true;
+        [HideInInspector]
+        public EditorUpdateMode editorUpdateMode = EditorUpdateMode.Default;
 #endif
         public enum Space { World, Local };
         public enum EvaluateMode { Cached, Calculate }
@@ -229,9 +232,9 @@ namespace Dreamteck.Splines
         {
             get {
 #if UNITY_EDITOR
-                if (!isPlaying) return transform.position;
+                if (!_isPlaying) return transform.position;
 #endif    
-                return lastPosition;
+                return _lastPosition;
             }
         }
         /// <summary>
@@ -241,9 +244,9 @@ namespace Dreamteck.Splines
         {
             get {
 #if UNITY_EDITOR
-                if (!isPlaying) return transform.rotation;
+                if (!_isPlaying) return transform.rotation;
 #endif
-                return lastRotation;
+                return _lastRotation;
             }
         }
         /// <summary>
@@ -253,9 +256,9 @@ namespace Dreamteck.Splines
         {
             get {
 #if UNITY_EDITOR
-                if (!isPlaying) return transform.lossyScale;
+                if (!_isPlaying) return transform.lossyScale;
 #endif
-                return lastScale;
+                return _lastScale;
             }
         }
 
@@ -314,28 +317,28 @@ namespace Dreamteck.Splines
         [HideInInspector]
         [SerializeField]
         private NodeLink[] nodes = new NodeLink[0];
-        private bool rebuildPending = false;
-
-        private bool _trsCheck = false;
+        private bool _rebuildPending = false;
+        private bool _trsCached = false;
         private Transform _trs = null;
         public Transform trs
         {
             get
             {
-                if (!_trsCheck)
+                if (!_trsCached)
                 {
                     _trs = transform;
+                    _trsCached = true;
                 }
                 return _trs;
             }
         }
 
-        private Matrix4x4 transformMatrix = new Matrix4x4();
-        private Matrix4x4 inverseTransformMatrix = new Matrix4x4();
-        private bool queueResample = false, queueRebuild = false;
-        private Vector3 lastPosition = Vector3.zero, lastScale = Vector3.zero;
-        private bool uniformScale = true;
-        private Quaternion lastRotation = Quaternion.identity;
+        private Matrix4x4 _transformMatrix = new Matrix4x4();
+        private Matrix4x4 _inverseTransformMatrix = new Matrix4x4();
+        private bool _queueResample = false, _queueRebuild = false;
+        private Vector3 _lastPosition = Vector3.zero, _lastScale = Vector3.zero;
+        private bool _uniformScale = true;
+        private Quaternion _lastRotation = Quaternion.identity;
 
         public event EmptySplineHandler onRebuild;
 
@@ -345,7 +348,7 @@ namespace Dreamteck.Splines
             {
                 return multithreaded
 #if UNITY_EDITOR
-                && isPlaying
+                && _isPlaying
 #endif
                 ;
             }
@@ -367,9 +370,9 @@ namespace Dreamteck.Splines
         private void Awake()
         {
 #if UNITY_EDITOR
-            isPlaying = Application.isPlaying;
-            if (!isPlaying) return; //Do not call rebuild on awake in the  editor
+            _isPlaying = Application.isPlaying;
 #endif
+            ResampleTransform();
         }
 
         private void Start()
@@ -377,10 +380,6 @@ namespace Dreamteck.Splines
             if (rebuildOnAwake)
             {
                 RebuildImmediate(true, true);
-            }
-            else
-            {
-                ResampleTransform();
             }
         }
 
@@ -422,12 +421,12 @@ namespace Dreamteck.Splines
             if (useMultithreading)
             {
                 //Rebuild users at the beginning of the next cycle if multithreaded
-                if (queueRebuild)
+                if (_queueRebuild)
                 {
                     RebuildUsers(immediate);
                 }
             }
-            if (queueResample)
+            if (_queueResample)
             {
                 if (useMultithreading)
                 {
@@ -465,7 +464,7 @@ namespace Dreamteck.Splines
             if (!useMultithreading)
             {
                 //If not multithreaded, rebuild users here
-                if (queueRebuild)
+                if (_queueRebuild)
                 {
                     RebuildUsers(immediate);
                 }
@@ -485,16 +484,17 @@ namespace Dreamteck.Splines
 
         bool TransformHasChanged()
         {
-            return lastPosition != trs.position || lastRotation != trs.rotation || lastScale != trs.lossyScale;
+            return _lastPosition != trs.position || _lastRotation != trs.rotation || _lastScale != trs.lossyScale;
         }
 
 #if UNITY_EDITOR
         private void Reset()
         {
             editorPathColor = SplinePrefs.defaultColor;
-            drawThinckness = SplinePrefs.defaultShowThickness;
+            editorDrawThickness = SplinePrefs.defaultShowThickness;
             is2D = SplinePrefs.default2D;
-            alwaysDraw = SplinePrefs.defaultAlwaysDraw;
+            editorAlwaysDraw = SplinePrefs.defaultAlwaysDraw;
+            editorUpdateMode = SplinePrefs.defaultEditorUpdateMode;
             space = SplinePrefs.defaultComputerSpace;
             type = SplinePrefs.defaultType;
         }
@@ -502,9 +502,9 @@ namespace Dreamteck.Splines
 
         void OnEnable()
         {
-            if (rebuildPending)
+            if (_rebuildPending)
             {
-                rebuildPending = false;
+                _rebuildPending = false;
                 Rebuild();
             }
         }
@@ -521,12 +521,12 @@ namespace Dreamteck.Splines
         /// </summary>
         public void ResampleTransform()
         {
-            transformMatrix.SetTRS(trs.position, trs.rotation, trs.lossyScale);
-            inverseTransformMatrix = transformMatrix.inverse;
-            lastPosition = trs.position;
-            lastRotation = trs.rotation;
-            lastScale = trs.lossyScale;
-            uniformScale = lastScale.x == lastScale.y && lastScale.y == lastScale.z;
+            _transformMatrix.SetTRS(trs.position, trs.rotation, trs.lossyScale);
+            _inverseTransformMatrix = _transformMatrix.inverse;
+            _lastPosition = trs.position;
+            _lastRotation = trs.rotation;
+            _lastScale = trs.lossyScale;
+            _uniformScale = _lastScale.x == _lastScale.y && _lastScale.y == _lastScale.z;
         }
 
         /// <summary>
@@ -1079,7 +1079,7 @@ namespace Dreamteck.Splines
             result.position = TransformPoint(result.position);
             result.forward = TransformDirection(result.forward);
             result.up = TransformDirection(result.up);
-            if (!uniformScale)
+            if (!_uniformScale)
             {
                 result.forward.Normalize();
                 result.up.Normalize();
@@ -1091,12 +1091,18 @@ namespace Dreamteck.Splines
             if(forceUpdateAll) SetPointsDirty();
 #if UNITY_EDITOR
             //If it's the editor and it's not playing, then rebuild immediate
-            if (Application.isPlaying) queueResample = true;
-            else RebuildImmediate(true);
+            if (_isPlaying) _queueResample = true;
+            else
+            {
+                if (editorUpdateMode == EditorUpdateMode.Default)
+                {
+                    RebuildImmediate(true);
+                }
+            }
 #else
-            queueResample = true;
+            _queueResample = true;
 #endif
-            if (updateMode == UpdateMode.None) queueResample = false;
+            if (updateMode == UpdateMode.None) _queueResample = false;
         }
 
         public void RebuildImmediate()
@@ -1108,7 +1114,7 @@ namespace Dreamteck.Splines
         {
             if (calculateSamples)
             {
-                queueResample = true;
+                _queueResample = true;
                 if (forceUpdateAll)
                 {
                     SetPointsDirty();
@@ -1116,7 +1122,7 @@ namespace Dreamteck.Splines
             }
             else
             {
-                queueResample = false;
+                _queueResample = false;
             }
             RunUpdate(true);
         }
@@ -1149,7 +1155,7 @@ namespace Dreamteck.Splines
                 }
             }
             if (onRebuild != null) onRebuild();
-            queueRebuild = false;
+            _queueRebuild = false;
         }
 
         void UnsetPointsDirty()
@@ -1187,7 +1193,7 @@ namespace Dreamteck.Splines
 
         private void CalculateSamples()
         {
-            queueResample = false;
+            _queueResample = false;
             if (pointCount == 0)
             {
                 if (_rawSamples.Length != 0)
@@ -1284,7 +1290,7 @@ namespace Dreamteck.Splines
                 if(sampleCollection.optimizedIndices.Length > 1) sampleCollection.optimizedIndices[sampleCollection.optimizedIndices.Length - 1] = sampleCollection.Count - 1;
             } else if (sampleCollection.Count > 0) sampleCollection.optimizedIndices = new int[0];
             sampleCollection.sampleMode = _sampleMode;
-            queueRebuild = true;
+            _queueRebuild = true;
             hasSamples = _sampleCount > 0;
             UnsetPointsDirty();
         }
@@ -1698,24 +1704,28 @@ namespace Dreamteck.Splines
                 return;
             }
             DisconnectNode(pointIndex);
+            SplineSample sample = Evaluate(newPointIndex);
+            node.transform.position = sample.position;
+            node.transform.rotation = sample.rotation;
             ConnectNode(node, newPointIndex);
         }
 
         public void ShiftNodes(int startIndex, int endIndex, int shift)
         {
-            if(startIndex < endIndex)
+            int from = endIndex;
+            int to = startIndex;
+            if(startIndex > endIndex)
             {
-                for (int i = endIndex; i >= startIndex; i--)
-                {
-                    Node node = GetNode(i);
-                    if(node != null) TransferNode(i, i + shift);
-                }
-            } else
+                from = startIndex;
+                to = endIndex;
+            }
+
+            for (int i = from; i >= to; i--)
             {
-                for (int i = startIndex; i >= endIndex; i--)
+                Node node = GetNode(i);
+                if (node != null)
                 {
-                    Node node = GetNode(i);
-                    if (node != null) TransferNode(i, i + shift);
+                    TransferNode(i, i + shift);
                 }
             }
         }
@@ -1873,7 +1883,7 @@ namespace Dreamteck.Splines
         {
             for (int i = 0; i < nodes.Length; i++)
             {
-                if (nodes[i].node == null)
+                if (nodes[i] == null || nodes[i].node == null)
                 {
                     RemoveNodeLinkAt(i);
                     Rebuild();
@@ -1893,7 +1903,6 @@ namespace Dreamteck.Splines
                 if (found)
                 {
                     nodes[i].node.UpdatePoint(this, nodes[i].pointIndex, GetPoint(nodes[i].pointIndex));
-                    nodes[i].node.UpdateConnectedComputers(this);
                 } else
                 {
                     RemoveNodeLinkAt(i);
@@ -1907,33 +1916,33 @@ namespace Dreamteck.Splines
         public Vector3 TransformPoint(Vector3 point)
         {
 #if UNITY_EDITOR
-            if (!isPlaying) return transform.TransformPoint(point);
+            if (!_isPlaying) return transform.TransformPoint(point);
 #endif
-            return transformMatrix.MultiplyPoint3x4(point);
+            return _transformMatrix.MultiplyPoint3x4(point);
         }
 
         public Vector3 InverseTransformPoint(Vector3 point)
         {
 #if UNITY_EDITOR
-            if (!isPlaying) return transform.InverseTransformPoint(point);
+            if (!_isPlaying) return transform.InverseTransformPoint(point);
 #endif
-            return inverseTransformMatrix.MultiplyPoint3x4(point);
+            return _inverseTransformMatrix.MultiplyPoint3x4(point);
         }
 
         public Vector3 TransformDirection(Vector3 direction)
         {
 #if UNITY_EDITOR
-            if (!isPlaying) return transform.TransformDirection(direction);
+            if (!_isPlaying) return transform.TransformDirection(direction);
 #endif
-            return transformMatrix.MultiplyVector(direction);
+            return _transformMatrix.MultiplyVector(direction);
         }
 
         public Vector3 InverseTransformDirection(Vector3 direction)
         {
 #if UNITY_EDITOR
-            if (!isPlaying) return transform.InverseTransformDirection(direction);
+            if (!_isPlaying) return transform.InverseTransformDirection(direction);
 #endif
-            return inverseTransformMatrix.MultiplyVector(direction);
+            return _inverseTransformMatrix.MultiplyVector(direction);
         }
 
         [System.Serializable]

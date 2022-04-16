@@ -28,8 +28,8 @@ namespace Databox.Ed
 		
 			if (_db != null)
 			{
-				DataboxObjectEditorWindow.dbObject = _db;
-				DataboxObjectEditorWindow.Init();		
+				DataboxObjectEditorInspector.dbObject = _db;
+				DataboxObjectEditorInspector.Init();		
 				
 				return true;
 			}

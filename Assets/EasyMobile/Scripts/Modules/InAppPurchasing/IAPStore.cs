@@ -7,7 +7,6 @@ namespace EasyMobile
     {
         GooglePlay,
         AmazonAppStore,
-        SamsungApps,
         MacAppStore,
         AppleAppStore,
         WinRT
@@ -17,7 +16,6 @@ namespace EasyMobile
     {
         GooglePlay,
         AmazonAppStore,
-        SamsungApps,
         NotSpecified
     }
 }
